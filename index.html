@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOAPS — Car Configuration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Saira+Condensed:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060709; --bg2:#0a0c0f; --panel:#0e1116; --panel2:#141923; --panel3:#1a212d;
+  --line:#252f3e; --line2:#39465a; --hair:rgba(255,255,255,.05);
+  --txt:#f4f7fb; --muted:#a6b2c3; --dim:#697789;
+  --accent:#d6fb00; --accent-dim:#aecb3a; --accent2:#ff7a52; --green:#3df0b6; --blue:#5cbcff;
+  --ss:#ff7a52; --int:#d6fb00; --st:#5cbcff; --rc:#3df0b6;
+  --mono:'JetBrains Mono',monospace; --cond:'Saira Condensed',sans-serif; --ui:'Chakra Petch',sans-serif;
+  --glow:0 0 0 1px rgba(214,251,0,.0),0 0 16px rgba(214,251,0,.0);
+  --gridline:rgba(255,255,255,.018); --scan:.42;
+  --radius:9px; --radius-sm:6px;
+  --shadow:0 1px 0 rgba(255,255,255,.04) inset, 0 10px 30px -12px rgba(0,0,0,.7), 0 2px 8px -4px rgba(0,0,0,.6);
+  --shadow-lift:0 1px 0 rgba(255,255,255,.06) inset, 0 22px 48px -16px rgba(0,0,0,.8), 0 4px 14px -6px rgba(0,0,0,.6);
+  --catch:linear-gradient(180deg,rgba(255,255,255,.05),transparent 38%);
+}
+body.light{
+  --bg:#eef1f5; --bg2:#e6eaf0; --panel:#ffffff; --panel2:#f5f7fa; --panel3:#eaeef3;
+  --line:#d2dae4; --line2:#b4c0ce; --hair:rgba(15,22,30,.07);
+  --txt:#0e141b; --muted:#52607240; --muted:#4d5b6e; --dim:#8492a3;
+  --accent:#5b6e00; --accent-dim:#7d9410; --accent2:#d2461c; --green:#0c9e72; --blue:#1671cf;
+  --ss:#d2461c; --int:#5b6e00; --st:#1671cf; --rc:#0c9e72;
+  --gridline:rgba(15,22,30,.035); --scan:0;
+  --shadow:0 1px 0 rgba(255,255,255,.7) inset, 0 8px 24px -14px rgba(34,48,68,.45), 0 1px 4px -2px rgba(34,48,68,.18);
+  --shadow-lift:0 1px 0 rgba(255,255,255,.9) inset, 0 18px 40px -16px rgba(34,48,68,.5), 0 3px 10px -4px rgba(34,48,68,.22);
+  --catch:linear-gradient(180deg,rgba(255,255,255,.6),transparent 40%);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--ui); background:var(--bg); color:var(--txt); font-size:16px;
+  -webkit-font-smoothing:antialiased; letter-spacing:.2px;
+  background-image:
+    linear-gradient(var(--gridline) 1px,transparent 1px),
+    linear-gradient(90deg,var(--gridline) 1px,transparent 1px),
+    radial-gradient(1100px 620px at 92% -12%,rgba(214,251,0,.07),transparent 60%),
+    radial-gradient(900px 600px at 0% 110%,rgba(92,188,255,.05),transparent 60%);
+  background-size:34px 34px,34px 34px,100% 100%,100% 100%;
+  background-attachment:fixed;
+  transition:background-color .25s,color .25s;
+}
+/* global scanline overlay */
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:999;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0,rgba(0,0,0,0) 2px,rgba(0,0,0,.16) 3px,rgba(0,0,0,0) 4px);
+  mix-blend-mode:multiply;opacity:var(--scan)}
+::selection{background:var(--accent);color:#0a0c00}
+
+.app{display:grid;grid-template-columns:332px minmax(0,1fr);height:100vh;overflow:hidden}
+
+/* ===== SIDEBAR ===== */
+.sidebar{background:linear-gradient(180deg,var(--panel),var(--bg2));border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.sidebar::after{content:"";position:absolute;top:0;right:0;width:1px;height:100%;background:linear-gradient(180deg,transparent,rgba(214,251,0,.35),transparent)}
+.brand{padding:20px 20px 16px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+.brand::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),transparent 70%);box-shadow:0 0 12px rgba(214,251,0,.6)}
+.brand .car{font-family:var(--mono);color:var(--accent);font-size:10.5px;letter-spacing:2.5px;font-weight:500;
+  text-shadow:0 0 10px rgba(214,251,0,.45)}
+.brand h1{font-family:var(--cond);font-weight:900;font-size:30px;line-height:.92;margin-top:5px;letter-spacing:.5px;
+  text-transform:uppercase}
+.brand .sub{color:var(--muted);font-size:10px;margin-top:7px;letter-spacing:1.5px;text-transform:uppercase;font-family:var(--mono)}
+.gear{position:absolute;top:16px;right:16px;background:var(--panel2);border:1px solid var(--line2);color:var(--muted);
+  width:34px;height:34px;border-radius:var(--radius-sm);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.18s;box-shadow:var(--shadow)}
+.gear:hover{color:var(--accent);border-color:var(--accent);box-shadow:0 0 14px rgba(214,251,0,.35)}
+.themebtn{position:absolute;top:16px;right:58px;background:var(--panel2);border:1px solid var(--line2);color:var(--muted);
+  width:34px;height:34px;border-radius:var(--radius-sm);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.18s;box-shadow:var(--shadow)}
+.themebtn:hover{color:var(--accent);border-color:var(--accent);box-shadow:0 0 14px rgba(214,251,0,.25)}
+.search{padding:12px 14px;border-bottom:1px solid var(--line);position:relative}
+.search::before{content:"⌕";position:absolute;left:24px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:15px}
+.search input{width:100%;background:var(--bg);border:1px solid var(--line2);color:var(--txt);
+  padding:9px 12px 9px 30px;border-radius:5px;font-family:var(--mono);font-size:12.5px;outline:none;transition:.18s;letter-spacing:.5px}
+.search input:focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 0 14px rgba(214,251,0,.25)}
+.search input::placeholder{color:var(--dim)}
+.databar{display:flex;gap:8px;padding:0 14px 12px;border-bottom:1px solid var(--line)}
+.dbtn{flex:1;background:var(--panel2);border:1px solid var(--line2);color:var(--muted);
+  font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;
+  padding:9px 8px;border-radius:var(--radius-sm,6px);cursor:pointer;transition:.16s;box-shadow:var(--shadow)}
+.dbtn:hover{color:var(--accent);border-color:var(--accent);box-shadow:0 0 14px rgba(214,251,0,.22);transform:translateY(-1px)}
+.dbtn:active{transform:translateY(0)}
+.list{overflow-y:auto;flex:1;padding:6px 8px 30px}
+.list::-webkit-scrollbar{width:7px}.list::-webkit-scrollbar-thumb{background:var(--line2);border-radius:4px}
+.list::-webkit-scrollbar-thumb:hover{background:var(--accent-dim)}
+.race-item{display:flex;align-items:center;gap:11px;padding:9px 11px 9px 11px;border-radius:var(--radius-sm);cursor:pointer;
+  border:1px solid transparent;transition:background .14s,border-color .14s,transform .14s;position:relative;margin-bottom:2px}
+.race-item .rail{position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:0 3px 3px 0;background:transparent;transition:.14s}
+.race-item:hover{background:var(--panel2);border-color:var(--line)}
+.race-item:hover .rail{background:var(--line2)}
+.race-item.active{background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 12%,transparent),transparent 82%);border-color:color-mix(in srgb,var(--accent) 32%,transparent);box-shadow:var(--shadow)}
+.race-item.active .rail{background:var(--accent);box-shadow:0 0 12px var(--accent)}
+.race-item .no{font-family:var(--mono);font-size:12px;color:var(--dim);min-width:20px;font-weight:500;text-align:right}
+.race-item.active .no{color:var(--accent)}
+.race-item .ti{flex:1;min-width:0}
+.race-item .tname{font-family:var(--cond);font-weight:700;font-size:16px;letter-spacing:.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}
+.race-item .tdate{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.3px;margin-top:1px}
+.tag{font-family:var(--mono);font-size:10.5px;font-weight:700;padding:3px 7px;border-radius:3px;letter-spacing:.8px;border:1px solid transparent}
+.tag.SS{background:rgba(255,91,46,.12);color:var(--ss);border-color:rgba(255,91,46,.3)}
+.tag.INT{background:rgba(214,251,0,.12);color:var(--int);border-color:rgba(214,251,0,.3)}
+.tag.ST{background:rgba(52,168,255,.12);color:var(--st);border-color:rgba(52,168,255,.3)}
+.tag.RC{background:rgba(39,224,164,.12);color:var(--rc);border-color:rgba(39,224,164,.3)}
+.nowline{display:flex;align-items:center;gap:8px;margin:6px 4px 6px 2px;user-select:none}
+.nowline .nl{flex:1;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--accent),rgba(214,251,0,.15));box-shadow:0 0 8px rgba(214,251,0,.45)}
+.nowline .nlt{font-family:var(--mono);font-size:8.5px;font-weight:700;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;text-shadow:0 0 8px rgba(214,251,0,.4);white-space:nowrap}
+.nowline .nld{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+
+/* ===== MAIN ===== */
+.main{overflow-y:auto;padding:0;position:relative}
+.main::-webkit-scrollbar{width:10px}.main::-webkit-scrollbar-thumb{background:var(--line2);border-radius:5px}
+.main::-webkit-scrollbar-thumb:hover{background:var(--accent-dim)}
+
+.hero{padding:32px 40px 26px;border-bottom:1px solid var(--line);position:relative;overflow:hidden;
+  background:linear-gradient(180deg,var(--panel2),transparent 80%)}
+.hero::after{content:attr(data-no);position:absolute;right:20px;top:-54px;font-family:var(--cond);font-weight:900;
+  font-size:248px;line-height:1;pointer-events:none;letter-spacing:-8px;
+  background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.01));-webkit-background-clip:text;background-clip:text;color:transparent}
+body.light .hero::after{background:linear-gradient(180deg,rgba(15,22,30,.06),rgba(15,22,30,.015));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-scan{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(214,251,0,.04) 50%,transparent);
+  animation:sweep 6s ease-in-out infinite}
+@keyframes sweep{0%,100%{transform:translateX(-30%);opacity:0}50%{transform:translateX(30%);opacity:1}}
+.crumb{font-family:var(--mono);font-size:10.5px;color:var(--accent);letter-spacing:2.5px;margin-bottom:9px;display:flex;align-items:center;gap:8px;font-weight:500}
+.herobill{position:absolute;top:32px;right:40px;z-index:3;display:flex;flex-direction:column;align-items:flex-end;gap:10px;
+  text-align:right;max-width:46%}
+.herobill .hb-row{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.herobill .hb-lbl{font-family:var(--mono);font-size:10px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase}
+.herobill .hb-driver{font-family:var(--cond);font-size:38px;font-weight:800;letter-spacing:.5px;color:var(--txt);line-height:1;text-transform:uppercase}
+.herobill .hb-sponsor{font-family:var(--cond);font-size:26px;font-weight:600;letter-spacing:.8px;color:var(--accent);line-height:1.05;text-transform:uppercase}
+.cdot{width:7px;height:7px;border-radius:50%;display:inline-block;box-shadow:0 0 8px currentColor}
+.cdot.SS{background:var(--ss);color:var(--ss)}.cdot.INT{background:var(--int);color:var(--int)}
+.cdot.ST{background:var(--st);color:var(--st)}.cdot.RC{background:var(--rc);color:var(--rc)}
+.hero h2{font-family:var(--cond);font-size:58px;font-weight:900;letter-spacing:.5px;line-height:.9;text-transform:uppercase;
+  animation:slideUp .5s cubic-bezier(.2,.8,.2,1) both}
+.hero .loc{color:var(--muted);font-family:var(--mono);font-size:13px;margin-top:9px;letter-spacing:.5px;display:flex;align-items:center;gap:7px;
+  animation:slideUp .5s .05s cubic-bezier(.2,.8,.2,1) both}
+.pin{width:6px;height:6px;border-radius:50%;border:2px solid var(--accent);display:inline-block}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.herotext{min-width:0}
+
+.herometa{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));margin-top:24px;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.hm{display:flex;flex-direction:column;background:var(--panel);padding:11px 13px;position:relative;
+  border-right:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:-1px;
+  animation:slideUp .45s cubic-bezier(.2,.8,.2,1) both}
+.hm:last-child{border-right:none}
+.hm:nth-child(1){animation-delay:.12s}.hm:nth-child(2){animation-delay:.16s}.hm:nth-child(3){animation-delay:.2s}
+.hm:nth-child(4){animation-delay:.24s}.hm:nth-child(5){animation-delay:.28s}.hm:nth-child(6){animation-delay:.32s}.hm:nth-child(7){animation-delay:.36s}
+.hm .k{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;align-self:flex-start}
+.hm .v{font-family:var(--mono);font-weight:700;font-size:17px;margin-top:4px;letter-spacing:.3px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;align-self:center;text-align:center}
+.hm .v small{color:var(--muted);font-weight:500;font-size:11px;margin-left:1px}
+.wx .v{display:flex;align-items:center;gap:7px}
+.wx .wicon{font-size:17px;line-height:1}
+.wx .wstate{font-family:var(--mono);font-size:8.5px;letter-spacing:.8px;margin-top:3px;text-transform:uppercase;align-self:center;text-align:center}
+.wx .wstate.live{color:var(--green);text-shadow:0 0 8px rgba(39,224,164,.4)}
+.wx .wstate.planned{color:var(--dim)}
+.wx .wstate.loading{color:var(--muted)}
+.wx .wstate.err{color:var(--accent2)}
+.wx .wdesc{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px;align-self:center;text-align:center}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ===== GRID / CARDS ===== */
+/* Tire allocation horizontal strip (under hero) */
+.allocstrip{margin:0 40px;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;position:relative;background:var(--panel);
+  box-shadow:var(--shadow);animation:slideUp .5s .1s cubic-bezier(.2,.8,.2,1) both}
+.allocstrip .cardglow{position:absolute;top:0;left:0;right:0;height:2px;z-index:2;background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.allocstrip h3{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;
+  padding:12px 15px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;
+  background:linear-gradient(180deg,var(--panel3),var(--panel2))}
+.allocstrip h3 .chan{color:var(--dim);font-weight:700;font-size:9px;letter-spacing:1.5px}
+.allocstrip h3 .ttl{color:var(--txt);font-family:var(--cond);font-size:15px;font-weight:700;letter-spacing:.6px;flex:1;text-transform:uppercase}
+.allocstrip h3 .dot{width:7px;height:7px;border-radius:50%;background:var(--green);color:var(--green);box-shadow:0 0 8px currentColor}
+.allocstrip h3 .tspec{display:flex;align-items:center;gap:18px;text-transform:none}
+.allocstrip h3 .tspec .tp{display:flex;flex-direction:column;line-height:1.2}
+.allocstrip h3 .tspec .tp .tk{font-family:var(--mono);font-size:9.5px;letter-spacing:1px;color:var(--dim);text-transform:uppercase}
+.allocstrip h3 .tspec .tp .tv{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--blue);letter-spacing:.3px}
+.allocrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1px;background:var(--line)}
+.allocrow .ac{display:flex;flex-direction:column;background:var(--panel);padding:11px 15px}
+.allocrow .ac .k{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase}
+.allocrow .ac .v{font-family:var(--mono);font-weight:700;font-size:17px;margin-top:4px;letter-spacing:.3px;color:var(--txt)}
+.allocrow .ac.rain .v{color:var(--st)}
+.allocrow .ac.rain .k{color:var(--st);opacity:.8}
+.allocrow .ac.calc .v{color:var(--accent)}
+.allocrow .ac.calc .k{color:var(--accent-dim)}
+.grid{padding:26px 40px 56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:16px}
+.card{background:linear-gradient(180deg,var(--panel2),var(--panel) 60px);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;position:relative;
+  box-shadow:var(--shadow);transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s,border-color .22s;
+  animation:cardIn .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.32s + var(--d,1) * .07s)}
+.card::before{content:"";position:absolute;inset:0 0 auto;height:46px;background:var(--catch);pointer-events:none;z-index:0}
+@keyframes cardIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.card:hover{border-color:var(--line2);transform:translateY(-3px);box-shadow:var(--shadow-lift)}
+.card:hover .cardglow{opacity:1}
+.cardglow{position:absolute;top:0;left:0;right:0;height:2px;opacity:.7;transition:.3s;z-index:2;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.card.setup .cardglow{background:linear-gradient(90deg,transparent,var(--int),transparent)}
+.card.brakes .cardglow{background:linear-gradient(90deg,transparent,var(--accent2),transparent)}
+.card.alloc .cardglow{background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.card.steering .cardglow{background:linear-gradient(90deg,transparent,var(--st),transparent)}
+.card.windshield .cardglow{background:linear-gradient(90deg,transparent,var(--blue),transparent)}
+.card.glass .cardglow{background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.card.systems .cardglow{background:linear-gradient(90deg,transparent,var(--accent2),transparent)}
+.card.interior .cardglow{background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+.card h3{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;
+  padding:12px 15px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;position:relative;z-index:1;
+  background:linear-gradient(180deg,var(--panel3),var(--panel2))}
+.card h3 .chan{color:var(--dim);font-weight:700;font-size:9px;letter-spacing:1.5px}
+.card h3 .ttl{color:var(--txt);font-family:var(--cond);font-size:16px;font-weight:700;letter-spacing:.6px;flex:1;text-transform:uppercase}
+.card h3 .dot{width:7px;height:7px;border-radius:50%;background:var(--int);box-shadow:0 0 8px currentColor;color:var(--int)}
+.card .rows,.card .padcap,.card .padgrid,.card .fangrid,.card .nacagrid,.card .notetext{position:relative;z-index:1}
+.card.windshield h3 .dot{background:var(--blue);color:var(--blue)}
+.card.brakes h3 .dot{background:var(--accent2);color:var(--accent2)}
+.card.alloc h3 .dot{background:var(--green);color:var(--green)}
+.card.steering h3 .dot{background:var(--st);color:var(--st)}
+.card.glass h3 .dot{background:var(--green);color:var(--green)}
+.card.systems h3 .dot{background:var(--accent2);color:var(--accent2)}
+.card.interior h3 .dot{background:var(--accent);color:var(--accent)}
+.card.notes h3 .dot{background:var(--muted);color:var(--muted)}
+.card.notes{grid-column:1/-1}
+.rows{padding:4px 0}
+.row{display:flex;align-items:baseline;gap:10px;padding:8px 15px;position:relative;transition:background .15s}
+.row:not(:last-child){border-bottom:1px solid var(--hair)}
+.row:hover{background:color-mix(in srgb,var(--accent) 5%,transparent)}
+.row .k{font-family:var(--ui);font-size:13.5px;color:var(--muted);letter-spacing:.3px;flex-shrink:0;font-weight:500}
+.row .lead{flex:1;border-bottom:1px dotted var(--line2);transform:translateY(-3px);min-width:14px}
+.row .v{font-family:var(--mono);font-weight:600;font-size:14px;text-align:right;color:var(--txt);letter-spacing:.3px}
+.row .v.empty{color:var(--dim)}
+.padgrid{margin:8px 15px;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;
+  display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);box-shadow:inset 0 1px 6px -3px rgba(0,0,0,.6)}
+.padgrid.col1{grid-template-columns:1fr}
+.padgrid .pc{background:var(--panel2);padding:9px 12px;display:flex;flex-direction:column;gap:3px}
+.padgrid .pc .pl{font-family:var(--mono);font-size:9px;letter-spacing:1.2px;color:var(--dim);text-transform:uppercase}
+.padgrid .pc .pv{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--txt);letter-spacing:.3px}
+.padgrid .pc .pv.empty{color:var(--dim)}
+.padcap{font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:1.6px;color:var(--accent-dim);text-transform:uppercase;padding:10px 15px 0}
+.fangrid{margin:8px 15px;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;
+  display:grid;grid-template-columns:auto 1fr 1fr;gap:1px;background:var(--line);box-shadow:inset 0 1px 6px -3px rgba(0,0,0,.6)}
+.fangrid .fh{background:var(--panel3);padding:6px 12px;font-family:var(--mono);font-size:9px;
+  letter-spacing:1.2px;color:var(--dim);text-transform:uppercase;display:flex;align-items:center}
+.fangrid .fs{background:var(--panel3);padding:9px 12px;font-family:var(--mono);font-size:11px;
+  font-weight:700;letter-spacing:1px;color:var(--muted);display:flex;align-items:center}
+.fangrid .fc{background:var(--panel2);padding:9px 12px;font-family:var(--mono);font-size:13px;
+  font-weight:600;color:var(--txt);letter-spacing:.3px;display:flex;align-items:center}
+.fangrid .fc.empty{color:var(--dim)}
+.nacagrid{margin:8px 15px;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;
+  display:grid;grid-template-columns:repeat(2,1fr);box-shadow:inset 0 1px 6px -3px rgba(0,0,0,.6)}
+.nacagrid .nc{background:var(--panel2);padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;
+  border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.nacagrid .nc:nth-child(2n){border-right:none}
+.nacagrid .nc:nth-last-child(-n+2){border-bottom:none}
+.nacagrid .nc .nk{font-family:var(--mono);font-size:8.5px;letter-spacing:.8px;color:var(--dim);text-transform:uppercase}
+.nacagrid .nc .nv{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--txt)}
+.nacagrid .nc .nv.empty{color:var(--dim)}
+.pill{font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 9px;border-radius:3px;letter-spacing:1px;border:1px solid transparent}
+.pill.yes{background:rgba(39,224,164,.12);color:var(--green);border-color:rgba(39,224,164,.35);text-shadow:0 0 8px rgba(39,224,164,.4)}
+.pill.no{background:rgba(255,255,255,.04);color:var(--dim);border-color:var(--line2)}
+.notetext{padding:14px 16px;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--txt);white-space:pre-wrap;
+  min-height:64px;outline:none;border-radius:0 0 var(--radius) var(--radius);transition:background .15s,box-shadow .15s}
+.notetext:hover{background:color-mix(in srgb,var(--accent) 4%,transparent);cursor:text}
+.notetext:focus{background:color-mix(in srgb,var(--accent) 6%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 45%,transparent)}
+.notetext:empty::before{content:attr(data-ph);color:var(--dim)}
+.card.notes h3 .notehint{font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--dim);text-transform:uppercase;margin-left:auto;margin-right:10px}
+
+.foot{display:flex;align-items:center;justify-content:center;gap:14px;color:var(--dim);font-family:var(--mono);
+  font-size:9.5px;letter-spacing:1.5px;padding:0 40px 36px;text-transform:uppercase}
+.foot-l{height:1px;flex:1;max-width:120px;background:linear-gradient(90deg,transparent,var(--line2),transparent)}
+
+/* ===== MODAL / MASTER PAGE ===== */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.74);backdrop-filter:blur(4px);display:none;z-index:50;
+  align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto}
+.overlay.open{display:flex}
+.modal{background:var(--panel);border:1px solid var(--line2);border-radius:8px;width:100%;max-width:780px;overflow:hidden;
+  box-shadow:0 40px 120px rgba(0,0,0,.7),0 0 0 1px rgba(214,251,0,.06);animation:modalIn .24s cubic-bezier(.2,.8,.2,1)}
+@keyframes modalIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+.modal-head{padding:20px 24px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));position:relative}
+.modal-head::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--accent),transparent 70%);box-shadow:0 0 12px rgba(214,251,0,.5)}
+.modal-head h2{font-family:var(--cond);font-size:26px;font-weight:900;letter-spacing:.5px;text-transform:uppercase}
+.modal-head .mp{font-family:var(--mono);font-size:9.5px;color:var(--accent);letter-spacing:2.5px;margin-bottom:5px;text-shadow:0 0 10px rgba(214,251,0,.4)}
+.modal-head .x{position:absolute;top:18px;right:20px;background:var(--panel);border:1px solid var(--line2);color:var(--muted);
+  font-size:18px;cursor:pointer;line-height:1;width:30px;height:30px;border-radius:5px;transition:.15s}
+.modal-head .x:hover{color:var(--accent2);border-color:var(--accent2)}
+.tabs{display:flex;gap:2px;padding:0 24px;border-bottom:1px solid var(--line);background:var(--panel2)}
+.tab{font-family:var(--mono);font-size:10.5px;letter-spacing:1px;color:var(--muted);background:none;border:none;
+  padding:13px 14px;cursor:pointer;border-bottom:2px solid transparent;text-transform:uppercase;transition:.15s}
+.tab:hover{color:var(--txt)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);text-shadow:0 0 10px rgba(214,251,0,.35)}
+.modal-body{padding:22px 24px;max-height:54vh;overflow-y:auto}
+.modal-body::-webkit-scrollbar{width:7px}.modal-body::-webkit-scrollbar-thumb{background:var(--line2);border-radius:4px}
+.pane{display:none}.pane.active{display:block;animation:slideUp .25s ease both}
+.field{margin-bottom:15px}
+.field label{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;background:var(--bg);border:1px solid var(--line2);color:var(--txt);
+  padding:10px 12px;border-radius:5px;font-family:var(--mono);font-size:13px;outline:none;transition:.15s;letter-spacing:.3px}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 0 12px rgba(214,251,0,.2)}
+.field textarea{resize:vertical;min-height:120px;line-height:1.6}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px}
+.racepick{margin-bottom:18px}
+.section-label{font-family:var(--mono);font-size:9.5px;letter-spacing:2px;color:var(--accent-dim);text-transform:uppercase;margin:20px 0 10px;padding-top:14px;border-top:1px solid var(--line)}
+.hint{font-family:var(--ui);font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.hint code{font-family:var(--mono);font-size:11px;background:var(--bg);padding:2px 5px;border-radius:3px;border:1px solid var(--line2);color:var(--accent)}
+.codebox{width:100%;background:#05060700;background-color:#050607;border:1px solid var(--line2);color:var(--green);padding:14px;border-radius:6px;
+  font-family:var(--mono);font-size:11px;line-height:1.5;resize:vertical;min-height:150px;outline:none}
+.modal-foot{padding:16px 24px;border-top:1px solid var(--line);background:var(--panel2);display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.btn{font-family:var(--mono);font-weight:500;font-size:12px;letter-spacing:.5px;padding:10px 17px;border-radius:5px;cursor:pointer;border:1px solid var(--line2);background:var(--panel);color:var(--txt);transition:.15s;text-transform:uppercase}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);color:#0a0c00;border-color:var(--accent);font-weight:700}
+.btn.primary:hover{box-shadow:0 0 18px rgba(214,251,0,.45);filter:brightness(1.06)}
+.btn.ghost{color:var(--muted)}
+.btn-group{display:flex;gap:9px;flex-wrap:wrap}
+.savemsg{font-family:var(--mono);font-size:10.5px;color:var(--green);opacity:0;transition:.3s;letter-spacing:.5px}
+.savemsg.show{opacity:1}
+
+/* ===== VIEW TOGGLE (sidebar) ===== */
+.viewtoggle{display:flex;gap:0;margin:0 14px 4px;border:1px solid var(--line2);border-radius:6px;overflow:hidden}
+.viewtoggle button{flex:1;background:var(--bg);color:var(--muted);border:none;cursor:pointer;
+  font-family:var(--mono);font-size:10px;letter-spacing:1px;padding:8px 6px;text-transform:uppercase;transition:.15s}
+.viewtoggle button.active{background:var(--accent);color:#0a0c00;font-weight:700}
+.viewtoggle button:not(.active):hover{color:var(--txt);background:var(--panel2)}
+
+/* ===== GRID (full-page master sheet) ===== */
+.gridview{padding:0;display:none;flex-direction:column;height:100%;min-width:0}
+.gridview.show{display:flex}
+.gridhead{padding:22px 30px 16px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--panel),transparent);position:relative}
+.gridhead .gh-crumb{font-family:var(--mono);font-size:10.5px;color:var(--accent);letter-spacing:2.5px;margin-bottom:8px;text-shadow:0 0 10px rgba(214,251,0,.4)}
+.gridhead h2{font-family:var(--cond);font-size:38px;font-weight:900;letter-spacing:.5px;text-transform:uppercase;line-height:.95}
+.gridhead .gh-sub{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:7px;letter-spacing:.5px}
+.gridscroll{flex:1;overflow:auto;min-height:0;min-width:0}
+.gridscroll::-webkit-scrollbar{width:11px;height:11px}.gridscroll::-webkit-scrollbar-thumb{background:var(--line2);border-radius:5px}
+.gridscroll::-webkit-scrollbar-thumb:hover{background:var(--accent-dim)}
+table.mastergrid{border-collapse:separate;border-spacing:0;font-family:var(--mono);font-size:11.5px;width:max-content;min-width:100%}
+table.mastergrid th,table.mastergrid td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:0;white-space:nowrap}
+table.mastergrid thead th{position:sticky;top:0;z-index:5;background:var(--panel3);color:var(--muted);
+  font-family:var(--mono);font-weight:700;font-size:9px;letter-spacing:1px;text-transform:uppercase;
+  padding:9px 11px;text-align:left;border-bottom:2px solid var(--line2)}
+table.mastergrid thead th .grp{display:block;color:var(--dim);font-size:8px;letter-spacing:1.5px;margin-bottom:2px}
+table.mastergrid thead th.g-config{color:var(--int)}
+table.mastergrid thead th.g-brakes{color:var(--accent2)}
+table.mastergrid thead th.g-steer{color:var(--st)}
+table.mastergrid thead th.g-alloc{color:var(--green)}
+table.mastergrid thead th.g-tires{color:var(--blue)}
+table.mastergrid tbody td{color:var(--txt);background:var(--panel)}
+table.mastergrid tbody tr:nth-child(even) td{background:var(--bg2)}
+table.mastergrid tbody tr:hover td{background:rgba(214,251,0,.045)}
+table.mastergrid td .cell{display:block;padding:7px 11px;min-width:56px;max-width:240px;overflow:hidden;text-overflow:ellipsis;outline:none;cursor:text}
+table.mastergrid td .cell:focus{background:rgba(214,251,0,.1);box-shadow:inset 0 0 0 2px var(--accent);border-radius:2px;white-space:normal;overflow:visible}
+table.mastergrid td.colnum,table.mastergrid td.coltrack{position:sticky;z-index:4;background:var(--panel2)!important;font-weight:700;color:var(--accent)}
+table.mastergrid td.colnum{left:0;text-align:center;min-width:38px}
+table.mastergrid td.coltrack{left:38px;border-right:2px solid var(--line2)}
+table.mastergrid thead th.colnum{left:0;z-index:6}
+table.mastergrid thead th.coltrack{left:38px;z-index:6;border-right:2px solid var(--line2)}
+table.mastergrid td .cell[data-yesno]{cursor:pointer}
+table.mastergrid td.cell-sel{background:rgba(52,168,255,.18)!important;box-shadow:inset 0 0 0 1px rgba(52,168,255,.5)}
+table.mastergrid td.cell-sel.colnum,table.mastergrid td.cell-sel.coltrack{background:rgba(52,168,255,.18)!important}
+table.mastergrid td.cell-anchor{box-shadow:inset 0 0 0 2px var(--blue)}
+.gridhint{font-family:var(--ui);font-size:12px;color:var(--muted);margin-top:8px}
+.gridhint b{color:var(--accent)}
+/* grid inside modal (compact) */
+#p-grid .gridscroll{max-height:48vh;border:1px solid var(--line);border-radius:6px}
+#p-grid table.mastergrid{font-size:12px}
+/* official reference table band */
+.refblock{border-top:2px solid var(--line2);background:var(--bg2);display:flex;flex-direction:column;max-height:30%}
+.refhead{font-family:var(--mono);font-size:9.5px;letter-spacing:1.5px;color:var(--green);padding:10px 30px;display:flex;align-items:center;gap:10px;text-transform:uppercase;border-bottom:1px solid var(--line)}
+.refblock.codes .refhead{color:var(--blue)}
+.refbar{width:18px;height:2px;background:var(--green);box-shadow:0 0 8px var(--green)}
+#refScroll,#refCodeScroll{flex:1;overflow:auto;padding-bottom:8px}
+table.reftbl{border-collapse:separate;border-spacing:0;font-family:var(--mono);font-size:12.5px;width:max-content;min-width:100%}
+table.reftbl th,table.reftbl td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:7px 14px;white-space:nowrap;text-align:left}
+table.reftbl thead th{position:sticky;top:0;z-index:3;background:var(--panel3);color:var(--green);font-weight:700;font-size:9.5px;letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid var(--line2)}
+table.reftbl tbody td{color:var(--txt);background:var(--panel)}
+table.reftbl tbody tr:nth-child(even) td{background:var(--bg2)}
+table.reftbl tbody tr.rain td{color:var(--st);font-style:italic}
+table.reftbl tbody tr.rain td:first-child::before{content:"☔ "}
+table.reftbl td.rnum{text-align:right;color:var(--muted)}
+
+@media(max-width:880px){
+  .app{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .sidebar{max-height:40vh}
+  .list{padding-bottom:10px}
+  .hero{padding:22px 18px}.hero h2{font-size:38px}.grid{padding:18px}
+  .allocstrip{margin:0 18px}
+  .hero::after{font-size:130px;right:6px;top:-26px}
+  .two,.three{grid-template-columns:1fr}
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="car" id="brandCar">CAR&nbsp;#19&nbsp;//&nbsp;NOAPS</div>
+      <h1 id="brandTitle">CONFIGURATION</h1>
+      <div class="sub" id="brandSub">2026 Season · 33 Events</div>
+      <button class="themebtn" id="themeBtn" title="Toggle light / dark mode">&#9790;</button>
+      <button class="gear" id="gearBtn" title="Master page / settings">&#9881;</button>
+    </div>
+    <div class="search"><input id="q" type="text" placeholder="SEARCH TRACK / DRIVER / SPONSOR…"></div>
+    <div class="databar">
+      <button id="exportBtn" class="dbtn" title="Download all data as an Excel file on your computer">↓ Save Excel</button>
+      <button id="importBtn" class="dbtn" title="Load data from a previously saved Excel file">↑ Load Excel</button>
+      <input id="importFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" style="display:none">
+    </div>
+    <div class="viewtoggle">
+      <button id="vtDash" class="active">▦ Dashboard</button>
+      <button id="vtGrid">▤ Master Grid</button>
+    </div>
+    <div class="list" id="list"></div>
+  </aside>
+  <main class="main" id="main"></main>
+  <section class="gridview" id="gridview">
+    <div class="gridhead">
+      <div class="gh-crumb">MASTER SHEET // EDITABLE</div>
+      <h2>Configuration Grid</h2>
+      <div class="gh-sub" id="gridSub">33 events · all channels</div>
+      <div class="gridhint">Click any cell to edit. <b>YES/blank</b> cells toggle on click. <b>Click + drag</b> or <b>shift-click</b> to select a range, then <b>Ctrl/Cmd-C</b> to copy and <b>Ctrl/Cmd-V</b> to paste (a single value fills the whole selection; you can also paste blocks from Excel). <b>Esc</b> clears. Changes save automatically. The <b>#</b> and <b>Track</b> columns are pinned.</div>
+    </div>
+    <div class="gridscroll" id="gridScroll"></div>
+    <div class="refblock">
+      <div class="refhead"><span class="refbar"></span>OFFICIAL GOODYEAR ALLOCATION CHART · REV B (2/6/26) · READ-ONLY REFERENCE</div>
+      <div class="gridscroll" id="refScroll"></div>
+    </div>
+    <div class="refblock codes">
+      <div class="refhead"><span class="refbar" style="background:var(--blue);box-shadow:0 0 8px var(--blue)"></span>GOODYEAR TIRE CODES &amp; INNER LINER BY TRACK · READ-ONLY REFERENCE</div>
+      <div class="gridscroll" id="refCodeScroll"></div>
+    </div>
+  </section>
+</div>
+
+<!-- MASTER PAGE MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="mp">MASTER PAGE</div>
+      <h2>Document Settings</h2>
+      <button class="x" id="closeX">&times;</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-pane="p-header">Header</button>
+      <button class="tab" data-pane="p-race">Race Config</button>
+      <button class="tab" data-pane="p-grid">Master Grid</button>
+      <button class="tab" data-pane="p-notes">Notes / Changelog</button>
+      <button class="tab" data-pane="p-export">Publish</button>
+    </div>
+    <div class="modal-body">
+      <!-- HEADER PANE -->
+      <div class="pane active" id="p-header">
+        <p class="hint">Edit the shared identity shown across the document. These apply to the whole season.</p>
+        <div class="two">
+          <div class="field"><label>Car Number</label><input id="m_car" type="text"></div>
+          <div class="field"><label>Team / Org</label><input id="m_team" type="text"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Document Title</label><input id="m_title" type="text"></div>
+          <div class="field"><label>Season Year</label><input id="m_season" type="text"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Primary Driver</label><input id="m_driver" type="text"></div>
+          <div class="field"><label>Primary Sponsor</label><input id="m_sponsor" type="text"></div>
+        </div>
+      </div>
+      <!-- RACE PANE -->
+      <div class="pane" id="p-race">
+        <p class="hint">Select an event and edit its configuration values. Changes save with the document.</p>
+        <div class="field racepick"><label>Event</label><select id="m_racepick"></select></div>
+        <div class="two">
+          <div class="field"><label>Track</label><input id="r_track"></div>
+          <div class="field"><label>Type</label><select id="r_type"><option>SS</option><option>INT</option><option>ST</option><option>RC</option></select></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Location</label><input id="r_location"></div>
+          <div class="field"><label>Length (mi)</label><input id="r_length"></div>
+        </div>
+        <div class="three">
+          <div class="field"><label>Date</label><input id="r_date"></div>
+          <div class="field"><label>Green Flag</label><input id="r_start"></div>
+          <div class="field"><label>High Temp (°F)</label><input id="r_temp"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Stages</label><input id="r_stages"></div>
+          <div class="field"><label>Pit Road Speed</label><input id="r_pitSpeed"></div>
+        </div>
+        <div class="three">
+          <div class="field"><label>Engine</label><input id="r_engine"></div>
+          <div class="field"><label>Driver</label><input id="r_driver"></div>
+          <div class="field"><label>Sponsor</label><input id="r_sponsor"></div>
+        </div>
+        <div class="section-label">Brake Ducts</div>
+        <div class="field"><label>Brake Ducts</label><input id="r_brakeDucts"></div>
+        <div class="three">
+          <div class="field"><label>LF Bead Fan</label><input id="r_fanLFbead"></div>
+          <div class="field"><label>LF Caliper Fan</label><input id="r_fanLFcaliper"></div>
+          <div class="field"><label>LF Rotor Fan</label><input id="r_fanLFrotor"></div>
+        </div>
+        <div class="three">
+          <div class="field"><label>RF Rotor Fan</label><input id="r_fanRFrotor"></div>
+          <div class="field"><label>RF Caliper Fan</label><input id="r_fanRFcaliper"></div>
+          <div class="field"><label>RF Bead Fan</label><input id="r_fanRFbead"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>LR Caliper Fan</label><input id="r_fanLRcaliper"></div>
+          <div class="field"><label>LR Rotor Fan</label><input id="r_fanLRrotor"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>RR Caliper Fan</label><input id="r_fanRRcaliper"></div>
+          <div class="field"><label>RR Rotor Fan</label><input id="r_fanRRrotor"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>LF Shroud</label><input id="r_shroudLF"></div>
+          <div class="field"><label>RF Shroud</label><input id="r_shroudRF"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>LR Shroud</label><input id="r_shroudLR"></div>
+          <div class="field"><label>RR Shroud</label><input id="r_shroudRR"></div>
+        </div>
+        <div class="section-label">Windshield</div>
+        <div class="two">
+          <div class="field"><label>Type</label><input id="r_windshieldType"></div>
+          <div class="field"><label>Tear-offs</label><input id="r_tearoffs"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Wiper</label><input id="r_wiper"></div>
+          <div class="field"><label>Defogger</label><input id="r_defogger"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Sealing</label><input id="r_windshieldSealing"></div>
+          <div class="field"><label>Tire Sets</label><input id="r_tireSets"></div>
+        </div>
+        <div class="field"><label>Blackout</label><input id="r_windshieldBlackout"></div>
+        <div class="section-label">Interior</div>
+        <div class="three">
+          <div class="field"><label>LS Mirror Type</label><input id="r_lsMirror"></div>
+          <div class="field"><label>LS Mirror Color</label><input id="r_lsMirrorColor"></div>
+          <div class="field"><label>Rearview Mirror</label><input id="r_rearMirror"></div>
+        </div>
+        <div class="field"><label>Firebottle Location</label><input id="r_firebottles"></div>
+        <div class="section-label">Windows · Mirrors</div>
+        <div class="two">
+          <div class="field"><label>RS Window</label><input id="r_rsWindow"></div>
+          <div class="field"><label>RS Window Cfg</label><input id="r_rsWindow2"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>RS Window Tint</label><input id="r_rsTint"></div>
+          <div class="field"><label>LR Quarter Window</label><input id="r_lrQuarter"></div>
+        </div>
+        <div class="field"><label>RR Quarter Window</label><input id="r_rrQuarter"></div>
+        <div class="section-label">NACA Ducts</div>
+        <div class="three">
+          <div class="field"><label>NACA 1</label><input id="r_naca1"></div>
+          <div class="field"><label>NACA 2</label><input id="r_naca2"></div>
+          <div class="field"><label>NACA 3</label><input id="r_naca3"></div>
+        </div>
+        <div class="three">
+          <div class="field"><label>NACA 4</label><input id="r_naca4"></div>
+          <div class="field"><label>NACA 5</label><input id="r_naca5"></div>
+          <div class="field"><label>NACA 6</label><input id="r_naca6"></div>
+        </div>
+        <div class="three">
+          <div class="field"><label>NACA 7</label><input id="r_naca7"></div>
+          <div class="field"><label>NACA 8</label><input id="r_naca8"></div>
+          <div class="field"><label>NACA 9</label><input id="r_naca9"></div>
+        </div>
+        <div class="field"><label>NACA 10</label><input id="r_naca10"></div>
+        <div class="section-label">Electrical · Cooling</div>
+        <div class="two">
+          <div class="field"><label>Battery</label><input id="r_battery"></div>
+          <div class="field"><label>Radiator Fan</label><input id="r_radiatorFan"></div>
+        </div>
+        <div class="section-label">Brake Package</div>
+        <div class="field"><label>Plumbing</label><input id="r_plumbing"></div>
+        <div class="two">
+          <div class="field"><label>Front Rotor Desc</label><input id="r_frontRotor"></div>
+          <div class="field"><label>Front Rotor P/N</label><input id="r_frontRotorPN"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Rear Rotor Desc</label><input id="r_rearRotor"></div>
+          <div class="field"><label>Rear Rotor P/N</label><input id="r_rearRotorPN"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>LF Pad</label><input id="r_lfPad"></div>
+          <div class="field"><label>RF Pad</label><input id="r_rfPad"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>LR Pad</label><input id="r_lrPad"></div>
+          <div class="field"><label>RR Pad</label><input id="r_rrPad"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Front Caliper</label><input id="r_frontCal"></div>
+          <div class="field"><label>Rear Caliper</label><input id="r_rearCal"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Front Master</label><input id="r_frontMaster"></div>
+          <div class="field"><label>Rear Master</label><input id="r_rearMaster"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>PSI Front</label><input id="r_psiF"></div>
+          <div class="field"><label>PSI Rear</label><input id="r_psiR"></div>
+        </div>
+        <div class="field"><label>Prop Valve</label><input id="r_propValve"></div>
+        <div class="section-label">Steering</div>
+        <div class="two">
+          <div class="field"><label>Box Ratio</label><input id="r_steerRatio"></div>
+          <div class="field"><label>Box Torque</label><input id="r_steerTorque"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Pump</label><input id="r_steerPump"></div>
+          <div class="field"><label>Orifice</label><input id="r_steerOrifice"></div>
+        </div>
+        <div class="section-label">Tire Allocation (Goodyear)</div>
+        <div class="two">
+          <div class="field"><label>Laps</label><input id="r_allocLaps"></div>
+          <div class="field"><label>Miles</label><input id="r_allocMiles"></div>
+        </div>
+        <div class="three">
+          <div class="field"><label>Max Sets (P/Q/Race)</label><input id="r_allocMaxSets"></div>
+          <div class="field"><label>Race Set Allotment</label><input id="r_allocRaceSets"></div>
+          <div class="field"><label>Prev-Leased (Practice)</label><input id="r_allocPrevLeased"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>Rain — Max Sets</label><input id="r_allocRainMax"></div>
+          <div class="field"><label>Rain — Race Sets</label><input id="r_allocRainRace"></div>
+        </div>
+        <div class="section-label">Tire Spec (Goodyear)</div>
+        <div class="three">
+          <div class="field"><label>Tire Code LS</label><input id="r_tireLS"></div>
+          <div class="field"><label>Tire Code RS</label><input id="r_tireRS"></div>
+          <div class="field"><label>Inner Liner</label><input id="r_innerLiner"></div>
+        </div>
+        <div class="section-label">Race Notes</div>
+        <div class="field"><label>Notes for this race</label><textarea id="r_notes" placeholder="Notes specific to this track / event…"></textarea></div>
+      </div>
+      <!-- GRID PANE -->
+      <div class="pane" id="p-grid">
+        <p class="hint">The full master sheet — every event, every channel. Click a cell to edit; <b>YES/blank</b> cells toggle on click. Edits update the dashboard live and save with the document. For more room, use the full-page <b>Master Grid</b> view from the sidebar.</p>
+        <div class="gridscroll" id="gridScrollModal"></div>
+      </div>
+      <!-- NOTES PANE -->
+      <div class="pane" id="p-notes">
+        <p class="hint">A shared notes / changelog field. Use it to log setup changes, reasoning, or team announcements. Appears at the bottom of every race page.</p>
+        <div class="field"><label>Season Notes &amp; Changelog</label><textarea id="m_notes" placeholder="Season-wide notes. (Per-race notes are edited on each track's dashboard card.)"></textarea></div>
+      </div>
+      <!-- EXPORT PANE -->
+      <div class="pane" id="p-export">
+        <p class="hint"><strong>Embedded master sheet.</strong> The Excel workbook (Config / Brakes / Steering) is baked into this single HTML file — the page reads its data straight from it, fully offline. Use the button below to extract the spreadsheet whenever you want to bulk-edit it in Excel; after editing, re-embed it with <code>embed.py</code> and commit the updated HTML.</p>
+        <button class="btn primary" id="dlXlsxBtn" style="margin-bottom:18px">⬇ Download Master Sheet (.xlsx)</button>
+        <p class="hint"><strong>Publishing to your team (GitHub).</strong> "Save" keeps edits in your own browser only. To push changes so everyone sees them, click <em>Generate</em>, copy the config block below, and paste it into the <code>car_configuration.html</code> file replacing everything between the two <code>CONFIG-BLOCK</code> comment markers near the top of the &lt;script&gt;, then commit. Or use "Download Updated HTML" to get a ready-to-commit file.</p>
+        <button class="btn primary" id="genBtn" style="margin-bottom:14px">Generate Config Block</button>
+        <textarea class="codebox" id="exportBox" readonly placeholder="Click Generate…"></textarea>
+        <div class="btn-group" style="margin-top:12px">
+          <button class="btn" id="copyBtn">Copy to Clipboard</button>
+          <button class="btn" id="downloadBtn">Download Updated HTML</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span class="savemsg" id="saveMsg">Saved to this browser ✓</span>
+      <div class="btn-group">
+        <button class="btn ghost" id="resetBtn">Reset to Original</button>
+        <button class="btn" id="cancelBtn">Close</button>
+        <button class="btn primary" id="saveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/*===CONFIG-BLOCK-START=== edit values here (or via the Master Page) then commit to GitHub */
+const DEFAULT_HEADER = {
+  car: "19", team: "NOAPS", title: "CONFIGURATION",
+  season: "2026", driver: "Crews", sponsor: "Young Life"
+};
+const DEFAULT_NOTES = "";
+const RACES_DEFAULT = [{"num":"1","track":"Daytona","type":"SS","length":"2.5","engine":"SS","driver":"Ruggerio","sponsor":"1st Auto","location":"Daytona, FL","date":"Feb 14, 2026","start":"5:00 PM","temp":"71","brakeDucts":"","rsWindow":"YES","tireSets":"4","tearoffs":"5","windshieldType":"Stock","wiper":"","defogger":"","windshieldSealing":"Bot | RS","windshieldBlackout":"8\" straight","lsMirror":"SS","rsWindow2":"Solid, Dbl NACA, Braced","rsTint":"7\" From Top","lrQuarter":"TN1 (#3N)","rrQuarter":"TN4 (#2D, #6 Seat, #8G, #10G)","firebottles":"Rearward","battery":"20A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"305x25  72v","frontRotorPN":"DIV2213X529","rearRotor":"280x25  24v","rearRotorPN":"DIV2154X427A","lfPad":"PFC-01 (0.35)","rfPad":"PFC-01 (0.35)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"1.63-1.50","rearCal":"1.125-1.06","frontMaster":"0.937","rearMaster":"0.937","psiF":"500","psiR":"500","propValve":"Rears","steerRatio":"16:1","steerTorque":"95-100","steerPump":"40","steerOrifice":"0.15","allocLaps":"120","allocMiles":"300","allocMaxSets":"4","allocRaceSets":"4","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6102","tireRS":"6104","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"30-60-120","pitSpeed":"55","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"2","track":"Atlanta","type":"INT","length":"1.54","engine":"SS","driver":"Ruggerio","sponsor":"1st Auto","location":"Hampton, GA","date":"Feb 21, 2026","start":"5:00 PM","temp":"70","brakeDucts":"","rsWindow":"YES","tireSets":"4","tearoffs":"5","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"Bot | RS","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"Solid, Dbl NACA, Braced","rsTint":"7\" From Top","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9G)","rrQuarter":"TN1 (#2D)","firebottles":"Forward","battery":"20A","radiatorFan":"Dual 13\" / 25A","plumbing":"Front/Rear","frontRotor":"305x25  72v","frontRotorPN":"DIV2213X529","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X621","lfPad":"PFC-01 (0.35)","rfPad":"PFC-01 (0.35)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"1.63-1.50","rearCal":"1.125-1.06","frontMaster":"0.937","rearMaster":"0.937","psiF":"500","psiR":"500","propValve":"Rears","steerRatio":"12:1","steerTorque":"85 - 90","steerPump":"40","steerOrifice":"0.15","allocLaps":"163","allocMiles":"251","allocMaxSets":"4","allocRaceSets":"4","allocPrevLeased":"0","allocRainMax":"","allocRainRace":"","tireLS":"6124","tireRS":"6126","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"45-90-163","pitSpeed":"90-45","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"3","track":"COTA","type":"RC","length":"2.4","engine":"STD","driver":"Crews","sponsor":"Young Life","location":"Del Valle, TX","date":"Feb 28, 2026","start":"2:00 PM","temp":"69","brakeDucts":"YES","rsWindow":"","tireSets":"4","tearoffs":"5","windshieldType":"Molded RC","wiper":"Yes","defogger":"Yes","windshieldSealing":"All with silicone","windshieldBlackout":"8\" straight","lsMirror":"DF","rsWindow2":"","rsTint":"","lrQuarter":"TN3 (#1N, #5R, #7C)","rrQuarter":"TN3 (#2G, #6R, #8C)","firebottles":"Rearward - Left","battery":"20A","radiatorFan":"12\" / 16A - Left","plumbing":"Front/Rear","frontRotor":"328x42  70tur","frontRotorPN":"DIV4240X001","rearRotor":"328x35  56v","rearRotorPN":"DIV4229X054","lfPad":"PMU-H20 (0.53)","rfPad":"PMU-H20 (0.53)","lrPad":"PMU-H21 (0.47)","rrPad":"PMU-H21 (0.47)","frontCal":"1.63-1.37-1.19","rearCal":"1.37-1.25","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"Rears","steerRatio":"6:1 LW","steerTorque":"70 - 75","steerPump":"60","steerOrifice":"0.15","allocLaps":"65","allocMiles":"156","allocMaxSets":"5","allocRaceSets":"4","allocPrevLeased":"1","allocRainMax":"4","allocRainRace":"3","tireLS":"6166","tireRS":"6166","innerLiner":"No","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"20-40-65","pitSpeed":"40","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"4","track":"Phoenix","type":"ST","length":"1","engine":"STD","driver":"Crews","sponsor":"Young Life","location":"Avondale, AZ","date":"Mar 07, 2026","start":"5:30 PM","temp":"75","brakeDucts":"YES","rsWindow":"","tireSets":"4","tearoffs":"5","windshieldType":"Molded","wiper":"","defogger":"Yes","windshieldSealing":"All with silicone","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"","rsTint":"","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"TN1 (#2R)","firebottles":"Middle","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"328x40  56tur","frontRotorPN":"DIV4229X046","rearRotor":"328x35  36v","rearRotorPN":"DIV2201X612","lfPad":"PMU-H21 (0.47)","rfPad":"PMU-H20 (0.53)","lrPad":"PMU-H22 (0.44)","rrPad":"PMU-H21 (0.47)","frontCal":"1.63-1.37-1.19","rearCal":"1.37-1.25","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LF/LR","steerRatio":"8:1 LW","steerTorque":"80 - 85","steerPump":"60","steerOrifice":"0.15","allocLaps":"200","allocMiles":"200","allocMaxSets":"5","allocRaceSets":"4","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6142","tireRS":"6116","innerLiner":"No","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"45-90-200","pitSpeed":"45","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"5","track":"Las Vegas","type":"INT","length":"1.5","engine":"STD","driver":"Briscoe","sponsor":"Wix","location":"Las Vegas, NV","date":"Mar 14, 2026","start":"2:30 PM","temp":"71","brakeDucts":"","rsWindow":"YES","tireSets":"5","tearoffs":"6","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"Bot | Top | LS","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"Solid","rsTint":"7\" From Top","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"TN1 (#2D)","firebottles":"Forward","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Left/Right","frontRotor":"328x35  36v","frontRotorPN":"DIV2201X710","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X621","lfPad":"PFC-01 (0.35)","rfPad":"PFC-01 (0.35)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"LIT(1.125-1.25-1.63)","rearCal":"1.125-1.06","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LR","steerRatio":"12:1","steerTorque":"85 - 90","steerPump":"40","steerOrifice":"0.15","allocLaps":"200","allocMiles":"300","allocMaxSets":"6","allocRaceSets":"5","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6110","tireRS":"6140","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"45-90-200","pitSpeed":"45","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"6","track":"Darlington","type":"INT","length":"1.365","engine":"STD","driver":"Bell","sponsor":"Sports Clips","location":"Darlington, SC","date":"Mar 21, 2026","start":"5:30 PM","temp":"69","brakeDucts":"YES","rsWindow":"YES","tireSets":"5","tearoffs":"6","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"Bot | Top | LS","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"Solid","rsTint":"7\" From Top","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"TN1 (#2D)","firebottles":"Forward","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"328x38  56tur","frontRotorPN":"DIV4229X031","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X609C","lfPad":"PFC-01 (0.35)","rfPad":"PFC-13 (0.42)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"1.63-1.25-1.125","rearCal":"1.125-1.06","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"540","propValve":"LR","steerRatio":"10:1","steerTorque":"80-85","steerPump":"60","steerOrifice":"0.15","allocLaps":"147","allocMiles":"201","allocMaxSets":"7","allocRaceSets":"5","allocPrevLeased":"2","allocRainMax":"","allocRainRace":"","tireLS":"6106","tireRS":"6130","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"45-90-147","pitSpeed":"45","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"7","track":"Martinsville","type":"ST","length":"0.526","engine":"STD","driver":"Crews","sponsor":"Mobil 1","location":"Martinsville, VA","date":"Mar 28, 2026","start":"3:30 PM","temp":"64","brakeDucts":"YES","rsWindow":"","tireSets":"4","tearoffs":"5","windshieldType":"Molded","wiper":"","defogger":"Yes","windshieldSealing":"All with silicone","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"","rsTint":"","lrQuarter":"TN3 (#1N, #5R, #7C)","rrQuarter":"TN3 (#2R, #6R, #8G)","firebottles":"Rearward","battery":"20A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"328x42  70tur","frontRotorPN":"DIV4240X001","rearRotor":"328x35  56v","rearRotorPN":"DIV4229X054","lfPad":"PMU-H21 (0.47)","rfPad":"PMU-H20 (0.53)","lrPad":"PMU-H22 (0.44)","rrPad":"PMU-H22 (0.44)","frontCal":"1.63-1.37-1.19","rearCal":"1.37-1.25","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LF/LR","steerRatio":"6:1 LW","steerTorque":"70 - 75","steerPump":"60","steerOrifice":"0.165","allocLaps":"250","allocMiles":"132","allocMaxSets":"5","allocRaceSets":"4","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6118","tireRS":"6120","innerLiner":"No","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"60-120-250","pitSpeed":"30","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"8","track":"Rockingham","type":"ST","length":"0.94","engine":"STD","driver":"Crews","sponsor":"Mobil 1","location":"Rockingham, NC","date":"Apr 04, 2026","start":"2:30 PM","temp":"72","brakeDucts":"YES","rsWindow":"","tireSets":"4","tearoffs":"5","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"All","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"","rsTint":"","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"Solid","firebottles":"Forward","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Left/Right","frontRotor":"328x35  36v","frontRotorPN":"DIV2201X710","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X621","lfPad":"PFC-01 (0.35)","rfPad":"PFC-01 (0.35)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"LIT(1.125-1.25-1.63)","rearCal":"1.125-1.06","frontMaster":"0.875","rearMaster":"","psiF":"500","psiR":"500","propValve":"LR","steerRatio":"10:1","steerTorque":"80-85","steerPump":"60","steerOrifice":"0.15","allocLaps":"250","allocMiles":"235","allocMaxSets":"5","allocRaceSets":"4","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6106","tireRS":"6130","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"60-120-250","pitSpeed":"35","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"9","track":"Bristol","type":"ST","length":"0.533","engine":"STD","driver":"Crews","sponsor":"Mobil 1","location":"Bristol, TN","date":"Apr 11, 2026","start":"7:30 PM","temp":"66","brakeDucts":"YES","rsWindow":"","tireSets":"4","tearoffs":"5","windshieldType":"Molded","wiper":"","defogger":"Yes","windshieldSealing":"All with silicone","windshieldBlackout":"8\" straight","lsMirror":"DF","rsWindow2":"","rsTint":"","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"Solid","firebottles":"Forward","battery":"20A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"328x38  56tur","frontRotorPN":"DIV4229X031","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X609C","lfPad":"PFC-01 (0.35)","rfPad":"PFC-13 (0.42)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-13 (0.42)","frontCal":"1.63-1.25-1.125","rearCal":"1.125-1.06","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LR","steerRatio":"8:1","steerTorque":"75-80","steerPump":"60","steerOrifice":"0.165","allocLaps":"300","allocMiles":"160","allocMaxSets":"5","allocRaceSets":"4","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6106","tireRS":"6132","innerLiner":"RS Only","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"85-170-300","pitSpeed":"30","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"10","track":"Kansas","type":"INT","length":"1.5","engine":"STD","driver":"Crews","sponsor":"Young Life","location":"Kansas City, KS","date":"Apr 18, 2026","start":"6:00 PM","temp":"68","brakeDucts":"","rsWindow":"YES","tireSets":"5","tearoffs":"6","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"Bot | Top | LS","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"Solid","rsTint":"7\" From Top","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"TN1 (#2D)","firebottles":"Forward","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Left/Right","frontRotor":"328x35  36v","frontRotorPN":"DIV2201X710","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X621","lfPad":"PFC-01 (0.35)","rfPad":"PFC-01 (0.35)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"LIT(1.125-1.25-1.63)","rearCal":"1.125-1.06","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LR","steerRatio":"10:1","steerTorque":"80-85","steerPump":"40","steerOrifice":"0.15","allocLaps":"200","allocMiles":"300","allocMaxSets":"6","allocRaceSets":"5","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6110","tireRS":"6140","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"45-90-200","pitSpeed":"45","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"11","track":"Talladega","type":"SS","length":"2.66","engine":"SS","driver":"Crews","sponsor":"Mobil 1","location":"Talladega, AL","date":"Apr 25, 2026","start":"3:00 PM","temp":"77","brakeDucts":"","rsWindow":"YES","tireSets":"4","tearoffs":"5","windshieldType":"Stock","wiper":"","defogger":"","windshieldSealing":"Bot | RS","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"SS","rsWindow2":"Solid, Dbl NACA, Braced","rsTint":"7\" From Top","lrQuarter":"TN1 (#3N)","rrQuarter":"TN4 (#2D, #6 Seat, #8G, #10G)","firebottles":"Rearward","battery":"20A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"305x25  72v","frontRotorPN":"DIV2213X529","rearRotor":"280x25  24v","rearRotorPN":"DIV2154X427A","lfPad":"PFC-01 (0.35)","rfPad":"PFC-01 (0.35)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"1.63-1.50","rearCal":"1.125-1.06","frontMaster":"0.937","rearMaster":"0.937","psiF":"500","psiR":"500","propValve":"Rears","steerRatio":"14:1","steerTorque":"100-105","steerPump":"40","steerOrifice":"0.135","allocLaps":"113","allocMiles":"301","allocMaxSets":"4","allocRaceSets":"4","allocPrevLeased":"0","allocRainMax":"","allocRainRace":"","tireLS":"6102","tireRS":"6126","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"25-50-113","pitSpeed":"55","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"12","track":"Texas","type":"INT","length":"1.5","engine":"STD","driver":"Crews","sponsor":"Mobil 1","location":"Fort Worth, TX","date":"May 02, 2026","start":"2:30 PM","temp":"79","brakeDucts":"","rsWindow":"YES","tireSets":"5","tearoffs":"6","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"Bot | Top | LS","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"Solid","rsTint":"7\" From Top","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"TN1 (#2D)","firebottles":"Forward","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Left/Right","frontRotor":"328x35  36v","frontRotorPN":"DIV2201X710","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X621","lfPad":"PFC-01 (0.35)","rfPad":"PFC-01 (0.35)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"LIT(1.125-1.25-1.63)","rearCal":"1.125-1.06","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LR","steerRatio":"10:1","steerTorque":"80-85","steerPump":"40","steerOrifice":"0.15","allocLaps":"200","allocMiles":"300","allocMaxSets":"6","allocRaceSets":"5","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6110","tireRS":"6140","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"45-90-200","pitSpeed":"45","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"13","track":"Watkins Glen","type":"RC","length":"2.45","engine":"STD","driver":"Crews","sponsor":"Wix","location":"Watkins Glen, NY","date":"May 09, 2026","start":"4:00 PM","temp":"69","brakeDucts":"YES","rsWindow":"","tireSets":"4","tearoffs":"5","windshieldType":"Molded RC","wiper":"Yes","defogger":"Yes","windshieldSealing":"All with silicone","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"Dbl NACA Plate, Open","rsTint":"","lrQuarter":"TN3 (#1N, #5R, #7C)","rrQuarter":"TN3 (#2G, #6R, #8C)","firebottles":"Rearward - Right","battery":"20A","radiatorFan":"12\" / 16A - Right","plumbing":"Front/Rear","frontRotor":"328x42  70tur","frontRotorPN":"DIV4240X001","rearRotor":"328x35  56v","rearRotorPN":"DIV4229X054","lfPad":"PMU-H20 (0.53)","rfPad":"PMU-H20 (0.53)","lrPad":"PMU-H21 (0.47)","rrPad":"PMU-H21 (0.47)","frontCal":"1.63-1.37-1.19","rearCal":"1.37-1.25","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"Rears","steerRatio":"6:1 LW","steerTorque":"70 - 75","steerPump":"60","steerOrifice":"0.15","allocLaps":"82","allocMiles":"201","allocMaxSets":"5","allocRaceSets":"4","allocPrevLeased":"1","allocRainMax":"4","allocRainRace":"3","tireLS":"6166","tireRS":"6166","innerLiner":"No","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"20-40-82","pitSpeed":"40","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"14","track":"Dover","type":"ST","length":"1","engine":"STD","driver":"Crews","sponsor":"Flow","location":"Dover, DE","date":"May 16, 2026","start":"4:00 PM","temp":"74","brakeDucts":"YES","rsWindow":"","tireSets":"4","tearoffs":"5","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"All","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"","rsTint":"","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"Solid","firebottles":"Forward","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Left/Right","frontRotor":"328x35  36v","frontRotorPN":"DIV2201X710","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X621","lfPad":"PFC-01 (0.35)","rfPad":"PFC-01 (0.35)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"LIT(1.125-1.25-1.63)","rearCal":"1.125-1.06","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LR","steerRatio":"8:1","steerTorque":"75-80","steerPump":"60","steerOrifice":"0.15","allocLaps":"200","allocMiles":"200","allocMaxSets":"5","allocRaceSets":"4","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6106","tireRS":"6148","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"45-90-200","pitSpeed":"35","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"15","track":"Charlotte","type":"INT","length":"1.5","engine":"STD","driver":"Crews","sponsor":"Young Life","location":"Concord, NC","date":"May 23, 2026","start":"5:00 PM","temp":"83","brakeDucts":"","rsWindow":"YES","tireSets":"5","tearoffs":"6","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"Bot | Top | LS","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"Solid","rsTint":"7\" From Top","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"TN1 (#2D)","firebottles":"Forward","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Left/Right","frontRotor":"328x35  36v","frontRotorPN":"DIV2201X710","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X621","lfPad":"PFC-01 (0.35)","rfPad":"PFC-01 (0.35)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"LIT(1.125-1.25-1.63)","rearCal":"1.125-1.06","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LR","steerRatio":"10:1","steerTorque":"80-85","steerPump":"40","steerOrifice":"0.15","allocLaps":"200","allocMiles":"300","allocMaxSets":"6","allocRaceSets":"5","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6110","tireRS":"6160","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"45-90-200","pitSpeed":"45","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"16","track":"Nashville","type":"INT","length":"1.33","engine":"STD","driver":"Crews","sponsor":"Young Life","location":"Lebanon, TN","date":"May 30, 2026","start":"6:30 PM","temp":"83","brakeDucts":"YES","rsWindow":"YES","tireSets":"4","tearoffs":"5","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"Bot | Top | LS","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"Solid","rsTint":"7\" From Top","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"TN1 (#2D)","firebottles":"Forward","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"328x38  56tur","frontRotorPN":"DIV4229X031","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X609C","lfPad":"PFC-01 (0.35)","rfPad":"PFC-13 (0.42)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-13 (0.42)","frontCal":"LIT(1.125-1.25-1.63)","rearCal":"1.125-1.06","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LR","steerRatio":"8:1","steerTorque":"75-80","steerPump":"60","steerOrifice":"0.15","allocLaps":"188","allocMiles":"250","allocMaxSets":"5","allocRaceSets":"4","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6110","tireRS":"6148","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"45-90-188","pitSpeed":"45","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"17","track":"Pocono","type":"INT","length":"2.5","engine":"STD","driver":"Crews","sponsor":"Mobil 1","location":"Long Pond, PA","date":"Jun 13, 2026","start":"4:00 PM","temp":"73","brakeDucts":"","rsWindow":"YES","tireSets":"4","tearoffs":"5","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"Bot | Top | LS","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"Solid","rsTint":"7\" From Top","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"TN1 (#2D)","firebottles":"Forward","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"328x38  72v","frontRotorPN":"DIV4212X031","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X609C","lfPad":"PFC-01 (0.35)","rfPad":"PFC-13 (0.42)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"1.63-1.25-1.125","rearCal":"1.125-1.06","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LR","steerRatio":"10:1","steerTorque":"80-85","steerPump":"40","steerOrifice":"0.15","allocLaps":"100","allocMiles":"250","allocMaxSets":"5","allocRaceSets":"4","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6106","tireRS":"6134","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"25-50-100","pitSpeed":"55","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"18","track":"San Diego","type":"RC","length":"4","engine":"STD","driver":"Crews","sponsor":"Mobil 1","location":"Coronado, CA","date":"Jun 20, 2026","start":"2:00 PM","temp":"72","brakeDucts":"YES","rsWindow":"","tireSets":"4","tearoffs":"5","windshieldType":"Molded RC","wiper":"Yes","defogger":"Yes","windshieldSealing":"All with silicone","windshieldBlackout":"8\" straight","lsMirror":"DF","rsWindow2":"Dbl NACA Plate, Open","rsTint":"","lrQuarter":"TN3 (#1N, #5R, #7C)","rrQuarter":"TN3 (#2G, #6R, #8C)","firebottles":"Rearward - Left","battery":"20A","radiatorFan":"12\" / 16A - Left","plumbing":"Front/Rear","frontRotor":"328x42  70tur","frontRotorPN":"DIV4240X001","rearRotor":"328x35  56v","rearRotorPN":"DIV4229X054","lfPad":"PMU-H20 (0.53)","rfPad":"PMU-H20 (0.53)","lrPad":"PMU-H21 (0.47)","rrPad":"PMU-H21 (0.47)","frontCal":"1.63-1.37-1.19","rearCal":"1.37-1.25","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"Rears","steerRatio":"6:1 LW","steerTorque":"70 - 75","steerPump":"60","steerOrifice":"0.15","allocLaps":"60","allocMiles":"204","allocMaxSets":"6","allocRaceSets":"4","allocPrevLeased":"2","allocRainMax":"4","allocRainRace":"3","tireLS":"6166","tireRS":"6166","innerLiner":"No","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"15-30-60","pitSpeed":"40","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"19","track":"Sonoma","type":"RC","length":"1.99","engine":"STD","driver":"Crews","sponsor":"Mobil 1","location":"Sonoma, CA","date":"Jun 27, 2026","start":"2:30 PM","temp":"84","brakeDucts":"YES","rsWindow":"","tireSets":"4","tearoffs":"5","windshieldType":"Molded RC","wiper":"Yes","defogger":"Yes","windshieldSealing":"All with silicone","windshieldBlackout":"8\" straight","lsMirror":"DF","rsWindow2":"Dbl NACA Plate, Open","rsTint":"","lrQuarter":"TN3 (#1N, #5R, #7C)","rrQuarter":"TN3 (#2G, #6R, #8C)","firebottles":"Rearward - Right","battery":"20A","radiatorFan":"12\" / 16A - Right","plumbing":"Front/Rear","frontRotor":"328x42  70tur","frontRotorPN":"DIV4240X001","rearRotor":"328x35  56v","rearRotorPN":"DIV4229X054","lfPad":"PMU-H20 (0.53)","rfPad":"PMU-H20 (0.53)","lrPad":"PMU-H21 (0.47)","rrPad":"PMU-H21 (0.47)","frontCal":"1.63-1.37-1.19","rearCal":"1.37-1.25","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"Rears","steerRatio":"6:1 LW","steerTorque":"70 - 75","steerPump":"60","steerOrifice":"0.15","allocLaps":"79","allocMiles":"157","allocMaxSets":"5","allocRaceSets":"4","allocPrevLeased":"1","allocRainMax":"4","allocRainRace":"3","tireLS":"6166","tireRS":"6166","innerLiner":"No","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"20-45-79","pitSpeed":"40","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"20","track":"Chicagoland","type":"INT","length":"1.5","engine":"STD","driver":"Crews","sponsor":"Young Life","location":"Joliet, IL","date":"Jul 04, 2026","start":"4:30 PM","temp":"84","brakeDucts":"","rsWindow":"YES","tireSets":"5","tearoffs":"6","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"Bot | Top | LS","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"Solid","rsTint":"7\" From Top","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"TN1 (#2D)","firebottles":"Forward","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Left/Right","frontRotor":"328x35  36v","frontRotorPN":"DIV2201X710","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X621","lfPad":"PFC-01 (0.35)","rfPad":"PFC-01 (0.35)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"LIT(1.125-1.25-1.63)","rearCal":"1.125-1.06","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LR","steerRatio":"10:1","steerTorque":"80-85","steerPump":"40","steerOrifice":"0.15","allocLaps":"200","allocMiles":"300","allocMaxSets":"7","allocRaceSets":"5","allocPrevLeased":"2","allocRainMax":"","allocRainRace":"","tireLS":"6110","tireRS":"6160","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"45-90-200","pitSpeed":"45","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"21","track":"Atlanta 2","type":"INT","length":"1.54","engine":"SS","driver":"Crews","sponsor":"Mobil 1","location":"Hampton, GA","date":"Jul 11, 2026","start":"7:00 PM","temp":"90","brakeDucts":"","rsWindow":"YES","tireSets":"4","tearoffs":"5","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"Bot | RS","windshieldBlackout":"8\" straight","lsMirror":"DF","rsWindow2":"Solid, Dbl NACA, Braced","rsTint":"7\" From Top","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9G)","rrQuarter":"TN1 (#2D)","firebottles":"Forward","battery":"20A","radiatorFan":"Dual 13\" / 25A","plumbing":"Front/Rear","frontRotor":"305x25  72v","frontRotorPN":"DIV2213X529","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X621","lfPad":"PFC-01 (0.35)","rfPad":"PFC-01 (0.35)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"1.63-1.50","rearCal":"1.125-1.06","frontMaster":"0.937","rearMaster":"0.937","psiF":"500","psiR":"500","propValve":"Rears","steerRatio":"10:1","steerTorque":"80-85","steerPump":"40","steerOrifice":"0.15","allocLaps":"163","allocMiles":"251","allocMaxSets":"4","allocRaceSets":"4","allocPrevLeased":"0","allocRainMax":"","allocRainRace":"","tireLS":"6124","tireRS":"6146","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"45-90-163","pitSpeed":"90-45","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"22","track":"Indy","type":"INT","length":"2.5","engine":"SS","driver":"Crews","sponsor":"Young Life","location":"Speedway, IN","date":"Jul 25, 2026","start":"4:00 PM","temp":"85","brakeDucts":"","rsWindow":"YES","tireSets":"4","tearoffs":"5","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"Bot | Top | LS","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"Solid","rsTint":"7\" From Top","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"TN1 (#2D)","firebottles":"Middle","battery":"20A","radiatorFan":"Dual 13\" / 25A","plumbing":"Front/Rear","frontRotor":"305x35  36v","frontRotorPN":"DIV2201X703","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X621","lfPad":"PFC-01 (0.35)","rfPad":"PFC-01 (0.35)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"LIT(1.125-1.25-1.63)","rearCal":"1.125-1.06","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LR","steerRatio":"10:1","steerTorque":"80-85","steerPump":"40","steerOrifice":"0.15","allocLaps":"100","allocMiles":"250","allocMaxSets":"6","allocRaceSets":"4","allocPrevLeased":"2","allocRainMax":"","allocRainRace":"","tireLS":"6106","tireRS":"6134","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"30-60-100","pitSpeed":"45","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"23","track":"Iowa","type":"ST","length":"0.875","engine":"STD","driver":"Crews","sponsor":"Young Life","location":"Newton, IA","date":"Aug 08, 2026","start":"4:00 PM","temp":"84","brakeDucts":"YES","rsWindow":"","tireSets":"4","tearoffs":"5","windshieldType":"Molded","wiper":"","defogger":"Yes","windshieldSealing":"All with silicone","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"","rsTint":"","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"TN1 (#2R)","firebottles":"Middle","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"328x38  56tur","frontRotorPN":"DIV4229X031","rearRotor":"328x35  36v","rearRotorPN":"DIV2201X612","lfPad":"PFC-01 (0.35)","rfPad":"PFC-13 (0.42)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"1.63-1.37-1.19","rearCal":"1.25-1.125","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LR","steerRatio":"8:1","steerTorque":"75-80","steerPump":"60","steerOrifice":"0.15","allocLaps":"250","allocMiles":"219","allocMaxSets":"5","allocRaceSets":"4","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6106","tireRS":"6134","innerLiner":"No","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"60-120-250","pitSpeed":"40","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"24","track":"Daytona 2","type":"SS","length":"2.5","engine":"SS","driver":"Crews","sponsor":"Yahoo","location":"Daytona, FL","date":"Aug 28, 2026","start":"7:30 PM","temp":"73","brakeDucts":"","rsWindow":"YES","tireSets":"4","tearoffs":"5","windshieldType":"Stock","wiper":"","defogger":"","windshieldSealing":"Bot | RS","windshieldBlackout":"8\" straight","lsMirror":"SS","rsWindow2":"Solid, Dbl NACA, Braced","rsTint":"7\" From Top","lrQuarter":"TN1 (#3N)","rrQuarter":"TN4 (#2D, #6 Seat, #8G, #10G)","firebottles":"Rearward","battery":"20A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"305x25  72v","frontRotorPN":"DIV2213X529","rearRotor":"280x25  24v","rearRotorPN":"DIV2154X427A","lfPad":"PFC-01 (0.35)","rfPad":"PFC-01 (0.35)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"1.63-1.50","rearCal":"1.125-1.06","frontMaster":"0.937","rearMaster":"0.937","psiF":"500","psiR":"500","propValve":"Rears","steerRatio":"14:1","steerTorque":"100-105","steerPump":"40","steerOrifice":"0.135","allocLaps":"100","allocMiles":"250","allocMaxSets":"4","allocRaceSets":"4","allocPrevLeased":"0","allocRainMax":"","allocRainRace":"","tireLS":"6102","tireRS":"6152","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"30-60-100","pitSpeed":"55","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"25","track":"Darlington 2","type":"INT","length":"1.365","engine":"STD","driver":"Crews","sponsor":"Mobil 1","location":"Darlington, SC","date":"Sep 05, 2026","start":"7:30 PM","temp":"89","brakeDucts":"YES","rsWindow":"YES","tireSets":"5","tearoffs":"6","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"Bot | Top | LS","windshieldBlackout":"8\" straight","lsMirror":"DF","rsWindow2":"Solid","rsTint":"7\" From Top","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"TN1 (#2D)","firebottles":"Forward","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"328x38  56tur","frontRotorPN":"DIV4229X031","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X609C","lfPad":"PFC-01 (0.35)","rfPad":"PFC-13 (0.42)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"1.63-1.25-1.125","rearCal":"1.125-1.06","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"540","propValve":"","steerRatio":"10:1","steerTorque":"80-85","steerPump":"60","steerOrifice":"0.15","allocLaps":"147","allocMiles":"201","allocMaxSets":"7","allocRaceSets":"5","allocPrevLeased":"2","allocRainMax":"","allocRainRace":"","tireLS":"6106","tireRS":"6130","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"45-90-147","pitSpeed":"45","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"26","track":"Gateway","type":"ST","length":"1.25","engine":"STD","driver":"Crews","sponsor":"Young Life","location":"Madison, IL","date":"Sep 12, 2026","start":"6:30 PM","temp":"82","brakeDucts":"YES","rsWindow":"","tireSets":"4","tearoffs":"5","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"All","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"","rsTint":"","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"TN1 (#2R)","firebottles":"Middle","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"328x40  56tur","frontRotorPN":"DIV4229X046","rearRotor":"328x35  36v","rearRotorPN":"DIV2201X612","lfPad":"PMU-H21 (0.47)","rfPad":"PMU-H20 (0.53)","lrPad":"PMU-H22 (0.44)","rrPad":"PMU-H21 (0.47)","frontCal":"1.63-1.37-1.19","rearCal":"1.37-1.25","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LF/LR","steerRatio":"8:1 LW","steerTorque":"75-80","steerPump":"60","steerOrifice":"0.15","allocLaps":"180","allocMiles":"225","allocMaxSets":"5","allocRaceSets":"4","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"","tireRS":"","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"45-90-180","pitSpeed":"40","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"27","track":"Bristol 2","type":"ST","length":"0.533","engine":"STD","driver":"Crews","sponsor":"Young Life","location":"Bristol, TN","date":"Sep 18, 2026","start":"7:30 PM","temp":"79","brakeDucts":"YES","rsWindow":"","tireSets":"4","tearoffs":"5","windshieldType":"Molded","wiper":"","defogger":"Yes","windshieldSealing":"All with silicone","windshieldBlackout":"8\" straight","lsMirror":"DF","rsWindow2":"","rsTint":"","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"Solid","firebottles":"Forward","battery":"20A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"328x38  56tur","frontRotorPN":"DIV4229X031","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X609C","lfPad":"PFC-01 (0.35)","rfPad":"PFC-13 (0.42)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-13 (0.42)","frontCal":"1.63-1.25-1.125","rearCal":"1.125-1.06","frontMaster":"0.875","rearMaster":"0.875","psiF":"","psiR":"","propValve":"","steerRatio":"8:1","steerTorque":"75-80","steerPump":"60","steerOrifice":"0.165","allocLaps":"300","allocMiles":"160","allocMaxSets":"5","allocRaceSets":"4","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6106","tireRS":"6132","innerLiner":"RS Only","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"85-170-300","pitSpeed":"30","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"28","track":"Las Vegas 2","type":"INT","length":"1.5","engine":"STD","driver":"Crews","sponsor":"Young Life","location":"Las Vegas, NV","date":"Oct 03, 2026","start":"4:30 PM","temp":"87","brakeDucts":"","rsWindow":"YES","tireSets":"5","tearoffs":"6","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"Bot | Top | LS","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"Solid","rsTint":"7\" From Top","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"TN1 (#2D)","firebottles":"Forward","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Left/Right","frontRotor":"328x35  36v","frontRotorPN":"DIV2201X710","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X621","lfPad":"PFC-01 (0.35)","rfPad":"PFC-01 (0.35)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"LIT(1.125-1.25-1.63)","rearCal":"1.125-1.06","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LR","steerRatio":"10:1","steerTorque":"80-85","steerPump":"40","steerOrifice":"0.15","allocLaps":"201","allocMiles":"302","allocMaxSets":"6","allocRaceSets":"5","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6110","tireRS":"6140","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"45-90-201","pitSpeed":"45","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"29","track":"Charlotte 2","type":"INT","length":"1.5","engine":"STD","driver":"Crews","sponsor":"Young Life","location":"Concord, NC","date":"Oct 10, 2026","start":"4:00 PM","temp":"76","brakeDucts":"","rsWindow":"YES","tireSets":"5","tearoffs":"6","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"Bot | Top | LS","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"Solid","rsTint":"7\" From Top","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"TN1 (#2D)","firebottles":"Forward","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"328x42  70tur","frontRotorPN":"DIV4240X001","rearRotor":"328x35  56v","rearRotorPN":"DIV4229X054","lfPad":"PMU-H20 (0.53)","rfPad":"PMU-H20 (0.53)","lrPad":"PMU-H21 (0.47)","rrPad":"PMU-H21 (0.47)","frontCal":"1.63-1.37-1.19","rearCal":"1.37-1.25","frontMaster":"0.813","rearMaster":"0.813","psiF":"500","psiR":"500","propValve":"Rears","steerRatio":"10:1","steerTorque":"80-85","steerPump":"40","steerOrifice":"0.15","allocLaps":"200","allocMiles":"300","allocMaxSets":"6","allocRaceSets":"5","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6110","tireRS":"6160","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"45-90-200","pitSpeed":"45","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"30","track":"Phoenix 2","type":"ST","length":"1","engine":"STD","driver":"Crews","sponsor":"Young Life","location":"Avondale, AZ","date":"Oct 17, 2026","start":"4:30 PM","temp":"88","brakeDucts":"YES","rsWindow":"","tireSets":"4","tearoffs":"5","windshieldType":"Molded","wiper":"","defogger":"Yes","windshieldSealing":"All with silicone","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"","rsTint":"","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"TN1 (#2R)","firebottles":"Middle","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"328x40  56tur","frontRotorPN":"DIV4229X046","rearRotor":"328x35  36v","rearRotorPN":"DIV2201X612","lfPad":"PMU-H21 (0.47)","rfPad":"PMU-H20 (0.53)","lrPad":"PMU-H22 (0.44)","rrPad":"PMU-H21 (0.47)","frontCal":"1.63-1.37-1.19","rearCal":"1.37-1.25","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LF/LR","steerRatio":"8:1 LW","steerTorque":"75-80","steerPump":"60","steerOrifice":"0.15","allocLaps":"200","allocMiles":"200","allocMaxSets":"5","allocRaceSets":"4","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6142","tireRS":"6116","innerLiner":"No","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"45-90-200","pitSpeed":"45","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"31","track":"Talladega 2","type":"SS","length":"2.66","engine":"SS","driver":"Crews","sponsor":"Yahoo","location":"Talladega, AL","date":"Oct 24, 2026","start":"2:30 PM","temp":"73","brakeDucts":"","rsWindow":"YES","tireSets":"4","tearoffs":"5","windshieldType":"Stock","wiper":"","defogger":"","windshieldSealing":"Bot | RS","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"SS","rsWindow2":"Solid, Dbl NACA, Braced","rsTint":"7\" From Top","lrQuarter":"TN1 (#3N)","rrQuarter":"TN4 (#2D, #6 Seat, #8G, #10G)","firebottles":"Rearward","battery":"20A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"305x25  72v","frontRotorPN":"DIV2213X529","rearRotor":"280x25  24v","rearRotorPN":"DIV2154X427A","lfPad":"PFC-01 (0.35)","rfPad":"PFC-01 (0.35)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"1.63-1.50","rearCal":"1.125-1.06","frontMaster":"0.937","rearMaster":"0.937","psiF":"500","psiR":"500","propValve":"Rears","steerRatio":"14:1","steerTorque":"100-105","steerPump":"40","steerOrifice":"0.135","allocLaps":"94","allocMiles":"250","allocMaxSets":"4","allocRaceSets":"4","allocPrevLeased":"0","allocRainMax":"","allocRainRace":"","tireLS":"6102","tireRS":"6126","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"25-50-94","pitSpeed":"55","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"32","track":"Martinsville 2","type":"ST","length":"0.526","engine":"STD","driver":"Crews","sponsor":"Mobil 1","location":"Martinsville, VA","date":"Oct 31, 2026","start":"4:00 PM","temp":"66","brakeDucts":"YES","rsWindow":"","tireSets":"4","tearoffs":"5","windshieldType":"Molded","wiper":"","defogger":"Yes","windshieldSealing":"All with silicone","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"","rsTint":"","lrQuarter":"TN3 (#1N, #5R, #7C)","rrQuarter":"TN3 (#2R, #6R, #8G)","firebottles":"Rearward","battery":"20A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"328x42  70tur","frontRotorPN":"DIV4240X001","rearRotor":"328x35  56v","rearRotorPN":"DIV4229X054","lfPad":"PMU-H21 (0.47)","rfPad":"PMU-H20 (0.53)","lrPad":"PMU-H22 (0.44)","rrPad":"PMU-H22 (0.44)","frontCal":"1.63-1.37-1.19","rearCal":"1.37-1.25","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LF/LR","steerRatio":"6:1 LW","steerTorque":"70 - 75","steerPump":"60","steerOrifice":"0.165","allocLaps":"250","allocMiles":"132","allocMaxSets":"5","allocRaceSets":"4","allocPrevLeased":"1","allocRainMax":"","allocRainRace":"","tireLS":"6118","tireRS":"6120","innerLiner":"No","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"60-120-250","pitSpeed":"30","notes":"","rearMirror":"","lsMirrorColor":""},{"num":"33","track":"Homestead","type":"INT","length":"1.5","engine":"STD","driver":"Crews","sponsor":"Young Life","location":"Homestead, FL","date":"Nov 07, 2026","start":"5:00 PM","temp":"83","brakeDucts":"","rsWindow":"YES","tireSets":"6","tearoffs":"7","windshieldType":"Molded","wiper":"","defogger":"","windshieldSealing":"Bot | Top | LS","windshieldBlackout":"8\" LS to 12\" RS","lsMirror":"DF","rsWindow2":"Solid","rsTint":"7\" From Top","lrQuarter":"TN4 (#1N, #5/#6 Sol, #9 1/2G)","rrQuarter":"TN1 (#2D)","firebottles":"Forward","battery":"12A","radiatorFan":"12\" / 16A","plumbing":"Front/Rear","frontRotor":"328x35  36v","frontRotorPN":"DIV2201X710","rearRotor":"328x32  36v","rearRotorPN":"DIV2201X621","lfPad":"PFC-01 (0.35)","rfPad":"PFC-13 (0.42)","lrPad":"PFC-01 (0.35)","rrPad":"PFC-01 (0.35)","frontCal":"LIT(1.125-1.25-1.63)","rearCal":"1.125-1.06","frontMaster":"0.875","rearMaster":"0.875","psiF":"500","psiR":"500","propValve":"LR","steerRatio":"10:1","steerTorque":"80-85","steerPump":"40","steerOrifice":"0.15","allocLaps":"200","allocMiles":"300","allocMaxSets":"8","allocRaceSets":"6","allocPrevLeased":"2","allocRainMax":"","allocRainRace":"","tireLS":"","tireRS":"","innerLiner":"Yes","fanLFbead":"","fanLFcaliper":"","fanLFrotor":"","fanRFrotor":"","fanRFcaliper":"","fanRFbead":"","fanLRcaliper":"","fanLRrotor":"","fanRRcaliper":"","fanRRrotor":"","shroudLF":"","shroudRF":"","shroudLR":"","shroudRR":"","naca1":"","naca2":"","naca3":"","naca4":"","naca5":"","naca6":"","naca7":"","naca8":"","naca9":"","naca10":"","stages":"45-90-200","pitSpeed":"45","notes":"","rearMirror":"","lsMirrorColor":""}];
+/*===CONFIG-BLOCK-END===*/
+
+const TYPE = {SS:'Superspeedway',INT:'Intermediate',ST:'Short Track',RC:'Road Course'};
+const TRACK_META = {"coords":{"Daytona":[29.185,-81.07],"Atlanta":[33.387,-84.315],"COTA":[30.134,-97.641],"Phoenix":[33.375,-112.311],"Las Vegas":[36.272,-115.011],"Darlington":[34.293,-79.906],"Martinsville":[36.634,-79.851],"Rockingham":[34.969,-79.62],"Bristol":[36.515,-82.257],"Kansas":[39.115,-94.831],"Talladega":[33.567,-86.066],"Texas":[33.037,-97.282],"Watkins Glen":[42.337,-76.927],"Dover":[39.19,-75.53],"Charlotte":[35.352,-80.683],"Nashville":[36.158,-86.341],"Pocono":[41.054,-75.51],"San Diego":[32.689,-117.183],"Sonoma":[38.161,-122.454],"Chicagoland":[41.475,-88.057],"Indy":[39.795,-86.235],"Iowa":[41.681,-93.057],"Gateway":[38.65,-90.137],"Homestead":[25.451,-80.409]}};
+function trackKey(n){ return String(n).replace(/ 2$/,'').trim(); }
+const RACE_KEYS = ["num","track","type","length","stages","pitSpeed","engine","driver","sponsor","location","date","start","temp",
+  "brakeDucts","rsWindow","tireSets","tearoffs","windshieldType","wiper","defogger","windshieldSealing",
+  "windshieldBlackout","lsMirror","lsMirrorColor","rearMirror","rsWindow2","rsTint","lrQuarter","rrQuarter",
+  "naca1","naca2","naca3","naca4","naca5","naca6","naca7","naca8","naca9","naca10",
+  "firebottles","battery","radiatorFan",
+  "fanLFbead","fanLFcaliper","fanLFrotor","fanRFrotor","fanRFcaliper","fanRFbead",
+  "fanLRcaliper","fanLRrotor","fanRRcaliper","fanRRrotor","shroudLF","shroudRF","shroudLR","shroudRR",
+  "plumbing","frontRotor","frontRotorPN","rearRotor","rearRotorPN","lfPad","rfPad","lrPad","rrPad",
+  "frontCal","rearCal","frontMaster","rearMaster","psiF","psiR","propValve",
+  "steerRatio","steerTorque","steerPump","steerOrifice",
+  "allocLaps","allocMiles","allocMaxSets","allocRaceSets","allocPrevLeased",
+  "allocRainMax","allocRainRace",
+  "tireLS","tireRS","innerLiner","notes"];
+const LS_KEY = "noaps_car_config_v1";
+
+// Field metadata for the grid: [key, label, group, isYesNo]
+const FIELDS = [
+  ["num","#","config",false],["track","Track","config",false],["type","Type","config",false],
+  ["length","Length","config",false],["stages","Stages","config",false],["pitSpeed","Pit Road Speed","config",false],["engine","Engine","config",false],["driver","Driver","config",false],
+  ["sponsor","Sponsor","config",false],["location","Location","config",false],["date","Date","config",false],
+  ["start","Start Time","config",false],["temp","High Temp","config",false],
+  ["brakeDucts","Brake Ducts","config",true],["rsWindow","RS Window","config",true],
+  ["tireSets","Tire Sets","config",false],["tearoffs","Tear-offs","config",false],
+  ["windshieldType","W/S Type","config",false],["wiper","Wiper","config",true],["defogger","Defogger","config",true],
+  ["windshieldSealing","W/S Sealing","config",false],["windshieldBlackout","W/S Blackout","config",false],
+  ["lsMirror","LS Mirror Type","config",false],["lsMirrorColor","LS Mirror Color","config",false],["rearMirror","Rearview Mirror","config",false],["rsWindow2","RS Window Cfg","config",false],
+  ["rsTint","RS Tint","config",false],["lrQuarter","LR Quarter","config",false],["rrQuarter","RR Quarter","config",false],
+  ["naca1","NACA 1","config",false],["naca2","NACA 2","config",false],["naca3","NACA 3","config",false],["naca4","NACA 4","config",false],["naca5","NACA 5","config",false],
+  ["naca6","NACA 6","config",false],["naca7","NACA 7","config",false],["naca8","NACA 8","config",false],["naca9","NACA 9","config",false],["naca10","NACA 10","config",false],
+  ["firebottles","Firebottle Location","config",false],["battery","Battery","config",false],["radiatorFan","Radiator Fan","config",false],
+  ["fanLFbead","LF Bead Fan","brakes",false],["fanLFcaliper","LF Caliper Fan","brakes",false],["fanLFrotor","LF Rotor Fan","brakes",false],
+  ["fanRFrotor","RF Rotor Fan","brakes",false],["fanRFcaliper","RF Caliper Fan","brakes",false],["fanRFbead","RF Bead Fan","brakes",false],
+  ["fanLRcaliper","LR Caliper Fan","brakes",false],["fanLRrotor","LR Rotor Fan","brakes",false],
+  ["fanRRcaliper","RR Caliper Fan","brakes",false],["fanRRrotor","RR Rotor Fan","brakes",false],
+  ["shroudLF","LF Shroud","brakes",false],["shroudRF","RF Shroud","brakes",false],
+  ["shroudLR","LR Shroud","brakes",false],["shroudRR","RR Shroud","brakes",false],
+  ["plumbing","Plumbing","brakes",false],["frontRotor","Front Rotor","brakes",false],["frontRotorPN","F Rotor P/N","brakes",false],
+  ["rearRotor","Rear Rotor","brakes",false],["rearRotorPN","R Rotor P/N","brakes",false],
+  ["lfPad","LF Pad","brakes",false],["rfPad","RF Pad","brakes",false],["lrPad","LR Pad","brakes",false],["rrPad","RR Pad","brakes",false],
+  ["frontCal","Front Cal","brakes",false],["rearCal","Rear Cal","brakes",false],
+  ["frontMaster","F Master","brakes",false],["rearMaster","R Master","brakes",false],
+  ["psiF","PSI F","brakes",false],["psiR","PSI R","brakes",false],
+  ["propValve","Prop Valve","brakes",false],
+  ["steerRatio","Box Ratio","steer",false],["steerTorque","Box Torque","steer",false],
+  ["steerPump","Pump","steer",false],["steerOrifice","Orifice","steer",false],
+  ["allocLaps","Laps","alloc",false],["allocMiles","Miles","alloc",false],["allocMaxSets","Max Sets","alloc",false],
+  ["allocRaceSets","Race Sets","alloc",false],["allocPrevLeased","Prev Leased","alloc",false],
+  ["allocRainMax","Rain Max","alloc",false],["allocRainRace","Rain Race","alloc",false],
+  ["tireLS","Tire Code LS","tires",false],["tireRS","Tire Code RS","tires",false],["innerLiner","Inner Liner","tires",false],
+  ["notes","Notes","notes",false]
+];
+const GROUP_LABEL = {config:"CONFIG",brakes:"BRAKES",steer:"STEERING",alloc:"TIRE ALLOC",tires:"TIRE SPEC"};
+const TIRE_CODES = [{"track":"Atlanta 1","ls":"6124","rs":"6126","liner":"Yes"},{"track":"Atlanta 2","ls":"6124","rs":"6146","liner":"Yes"},{"track":"Bristol","ls":"6106","rs":"6132","liner":"RS Only"},{"track":"Charlotte","ls":"6110","rs":"6160","liner":"Yes"},{"track":"Chicagoland","ls":"6110","rs":"6160","liner":"Yes"},{"track":"COTA","ls":"6166","rs":"6166","liner":"No"},{"track":"Darlington","ls":"6106","rs":"6130","liner":"Yes"},{"track":"Daytona 1","ls":"6102","rs":"6104","liner":"Yes"},{"track":"Daytona 2","ls":"6102","rs":"6152","liner":"Yes"},{"track":"Dover","ls":"6106","rs":"6148","liner":"Yes"},{"track":"Homestead","ls":"","rs":"","liner":"Yes"},{"track":"Indianapolis","ls":"6106","rs":"6134","liner":"Yes"},{"track":"Iowa","ls":"6106","rs":"6134","liner":"No"},{"track":"Kansas","ls":"6110","rs":"6140","liner":"Yes"},{"track":"Las Vegas","ls":"6110","rs":"6140","liner":"Yes"},{"track":"Lime Rock","ls":"6166","rs":"6166","liner":"No"},{"track":"Loudon","ls":"6142","rs":"6116","liner":"No"},{"track":"Lucas Oil Indy","ls":"6142","rs":"6116","liner":"No"},{"track":"Martinsville","ls":"6118","rs":"6120","liner":"No"},{"track":"Michigan","ls":"6110","rs":"6140","liner":"Yes"},{"track":"Nashville","ls":"6110","rs":"6148","liner":"Yes"},{"track":"North Wilkesboro","ls":"6142","rs":"6116","liner":"No"},{"track":"Phoenix","ls":"6142","rs":"6116","liner":"No"},{"track":"Pocono","ls":"6106","rs":"6134","liner":"Yes"},{"track":"Richmond","ls":"6142","rs":"6116","liner":"No"},{"track":"Rockingham","ls":"6106","rs":"6130","liner":"Yes"},{"track":"San Diego SC","ls":"6166","rs":"6166","liner":"No"},{"track":"Sonoma","ls":"6166","rs":"6166","liner":"No"},{"track":"St. Pete SC","ls":"6166","rs":"6166","liner":"No"},{"track":"Talladega","ls":"6102","rs":"6126","liner":"Yes"},{"track":"Texas","ls":"6110","rs":"6140","liner":"Yes"},{"track":"Watkins Glen","ls":"6166","rs":"6166","liner":"No"},{"track":"WWTR Gateway","ls":"","rs":"","liner":"Yes"},{"track":"Wet Weather","ls":"","rs":"","liner":"No"}]; // 2026 Goodyear tire codes / inner-liner by track (data book)
+const TIRE_CHART = [{"rain":false,"name":"Daytona","date":"02/14/26","laps":120,"miles":300,"maxSets":4,"raceSets":4,"prevLeased":1},{"rain":false,"name":"Atlanta","date":"02/21/26","laps":163,"miles":251,"maxSets":4,"raceSets":4,"prevLeased":0},{"rain":false,"name":"Circuit of the Americas","date":"02/28/26","laps":65,"miles":156,"maxSets":5,"raceSets":4,"prevLeased":1},{"rain":true,"name":"Circuit of the Americas2","date":"02/28/26","laps":65,"miles":156,"maxSets":4,"raceSets":3,"prevLeased":4},{"rain":false,"name":"Phoenix3","date":"03/07/26","laps":200,"miles":200,"maxSets":5,"raceSets":4,"prevLeased":1},{"rain":false,"name":"Las Vegas","date":"03/14/26","laps":200,"miles":300,"maxSets":6,"raceSets":5,"prevLeased":1},{"rain":false,"name":"Darlington","date":"03/21/26","laps":147,"miles":201,"maxSets":7,"raceSets":5,"prevLeased":2},{"rain":false,"name":"Martinsville3","date":"03/28/26","laps":250,"miles":132,"maxSets":5,"raceSets":4,"prevLeased":1},{"rain":false,"name":"Rockingham","date":"04/04/26","laps":250,"miles":235,"maxSets":5,"raceSets":4,"prevLeased":1},{"rain":false,"name":"Bristol3","date":"04/11/26","laps":300,"miles":160,"maxSets":5,"raceSets":4,"prevLeased":1},{"rain":false,"name":"Kansas","date":"04/18/26","laps":200,"miles":300,"maxSets":6,"raceSets":5,"prevLeased":1},{"rain":false,"name":"Talladega","date":"04/25/26","laps":113,"miles":301,"maxSets":4,"raceSets":4,"prevLeased":0},{"rain":false,"name":"Texas","date":"05/02/26","laps":200,"miles":300,"maxSets":6,"raceSets":5,"prevLeased":1},{"rain":false,"name":"Watkins Glen","date":"05/09/26","laps":82,"miles":201,"maxSets":5,"raceSets":4,"prevLeased":1},{"rain":true,"name":"Watkins Glen2","date":"05/09/26","laps":82,"miles":201,"maxSets":4,"raceSets":3,"prevLeased":4},{"rain":false,"name":"Dover","date":"05/16/26","laps":200,"miles":200,"maxSets":5,"raceSets":4,"prevLeased":1},{"rain":false,"name":"Charlotte","date":"05/23/26","laps":200,"miles":300,"maxSets":6,"raceSets":5,"prevLeased":1},{"rain":false,"name":"Nashville","date":"05/30/26","laps":188,"miles":250,"maxSets":5,"raceSets":4,"prevLeased":1},{"rain":false,"name":"Pocono","date":"06/13/26","laps":100,"miles":250,"maxSets":5,"raceSets":4,"prevLeased":1},{"rain":false,"name":"San Diego","date":"06/20/26","laps":60,"miles":204,"maxSets":6,"raceSets":4,"prevLeased":2},{"rain":true,"name":"San Diego2","date":"06/20/26","laps":60,"miles":204,"maxSets":4,"raceSets":3,"prevLeased":4},{"rain":false,"name":"Sonoma","date":"06/27/26","laps":79,"miles":157,"maxSets":5,"raceSets":4,"prevLeased":1},{"rain":true,"name":"Sonoma2","date":"06/27/26","laps":79,"miles":157,"maxSets":4,"raceSets":3,"prevLeased":4},{"rain":false,"name":"Chicagoland","date":"07/04/26","laps":200,"miles":300,"maxSets":7,"raceSets":5,"prevLeased":2},{"rain":false,"name":"Atlanta","date":"07/11/26","laps":163,"miles":251,"maxSets":4,"raceSets":4,"prevLeased":0},{"rain":false,"name":"Indianapolis","date":"07/25/26","laps":100,"miles":250,"maxSets":6,"raceSets":4,"prevLeased":2},{"rain":false,"name":"Iowa3","date":"08/08/26","laps":250,"miles":219,"maxSets":5,"raceSets":4,"prevLeased":1},{"rain":false,"name":"Daytona","date":"08/28/26","laps":100,"miles":250,"maxSets":4,"raceSets":4,"prevLeased":0},{"rain":false,"name":"Darlington","date":"09/05/26","laps":147,"miles":201,"maxSets":7,"raceSets":5,"prevLeased":2},{"rain":false,"name":"Gateway","date":"09/12/26","laps":180,"miles":225,"maxSets":5,"raceSets":4,"prevLeased":1},{"rain":false,"name":"Bristol3","date":"09/18/26","laps":300,"miles":160,"maxSets":5,"raceSets":4,"prevLeased":1},{"rain":false,"name":"Las Vegas","date":"10/03/26","laps":201,"miles":302,"maxSets":6,"raceSets":5,"prevLeased":1},{"rain":false,"name":"Charlotte","date":"10/10/26","laps":200,"miles":300,"maxSets":6,"raceSets":5,"prevLeased":1},{"rain":false,"name":"Phoenix3","date":"10/17/26","laps":200,"miles":200,"maxSets":5,"raceSets":4,"prevLeased":1},{"rain":false,"name":"Talladega","date":"10/24/26","laps":94,"miles":250,"maxSets":4,"raceSets":4,"prevLeased":0},{"rain":false,"name":"Martinsville3","date":"10/31/26","laps":250,"miles":132,"maxSets":5,"raceSets":4,"prevLeased":1},{"rain":false,"name":"Homestead","date":"11/07/26","laps":200,"miles":300,"maxSets":8,"raceSets":6,"prevLeased":2}]; // official 2026 Goodyear allocation (REV B), incl. rain rows
+
+let HEADER, NOTES, RACES, activeIdx = 0, editIdx = 0;
+
+function loadState(){
+  let saved=null;
+  try{ saved = JSON.parse(localStorage.getItem(LS_KEY)||"null"); }catch(e){}
+  if(saved){
+    HEADER = Object.assign({}, DEFAULT_HEADER, saved.header||{});
+    NOTES  = saved.notes!==undefined ? saved.notes : DEFAULT_NOTES;
+    if(Array.isArray(saved.races) && saved.races.length){
+      // Merge each saved race over its default by race number, so any fields
+      // added after this was last saved (e.g. tire allocation) are backfilled
+      // from the embedded defaults instead of showing blank.
+      const byNum = {};
+      saved.races.forEach(r => { if(r && r.num!==undefined) byNum[String(r.num)] = r; });
+      RACES = RACES_DEFAULT.map(def => {
+        const s = byNum[String(def.num)];
+        return s ? Object.assign({}, def, s) : JSON.parse(JSON.stringify(def));
+      });
+    } else {
+      RACES = JSON.parse(JSON.stringify(RACES_DEFAULT));
+    }
+  } else {
+    HEADER = Object.assign({}, DEFAULT_HEADER);
+    NOTES  = DEFAULT_NOTES;
+    RACES  = JSON.parse(JSON.stringify(RACES_DEFAULT));
+  }
+}
+function persist(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify({header:HEADER,notes:NOTES,races:RACES})); }catch(e){}
+}
+function exportData(){
+  if(typeof XLSX==='undefined'){ alert("Spreadsheet library didn't load (no internet?). Try again when online."); return; }
+  // Races sheet: one row per race, columns = field labels in FIELDS order
+  const headerLabels = FIELDS.map(f=>f[1]);
+  const aoa = [headerLabels];
+  RACES.forEach(r=>{ aoa.push(FIELDS.map(f=>{ const v=r[f[0]]; return v===undefined||v===null?'':v; })); });
+  const wsRaces = XLSX.utils.aoa_to_sheet(aoa);
+  wsRaces['!cols'] = FIELDS.map(f=>({wch:Math.max(8, Math.min(28, f[1].length+2))}));
+  wsRaces['!freeze'] = {xSplit:2, ySplit:1};
+  // Info sheet: header fields + notes + a key map so import is reliable
+  const info = [
+    ['NOAPS Car Configuration — saved data'],
+    ['Saved', new Date().toLocaleString()],
+    [],
+    ['Car', HEADER.car||''],['Team', HEADER.team||''],['Title', HEADER.title||''],
+    ['Season', HEADER.season||''],['Driver', HEADER.driver||''],['Sponsor', HEADER.sponsor||''],
+    [],['Notes', NOTES||''],
+    [],['(Do not delete the Races sheet or change its header row — it is used to reload this file.)']
+  ];
+  const wsInfo = XLSX.utils.aoa_to_sheet(info);
+  wsInfo['!cols']=[{wch:14},{wch:60}];
+  // Hidden key map sheet (label -> field key) for robust re-import
+  const keymap=[['label','key']]; FIELDS.forEach(f=>keymap.push([f[1], f[0]]));
+  const wsKeys = XLSX.utils.aoa_to_sheet(keymap);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, wsInfo, 'Info');
+  XLSX.utils.book_append_sheet(wb, wsRaces, 'Races');
+  XLSX.utils.book_append_sheet(wb, wsKeys, '_keymap');
+  const stamp=new Date().toISOString().slice(0,10);
+  const carId=String((HEADER&&HEADER.car)||'car').replace(/[^\w-]/g,'');
+  XLSX.writeFile(wb, `NOAPS_${carId}_config_${stamp}.xlsx`);
+}
+function importData(file){
+  if(typeof XLSX==='undefined'){ alert("Spreadsheet library didn't load (no internet?). Try again when online."); return; }
+  const reader=new FileReader();
+  reader.onload=e=>{
+    let wb;
+    try{ wb=XLSX.read(new Uint8Array(e.target.result), {type:'array'}); }
+    catch(err){ alert("Couldn't read that file — make sure it's an .xlsx saved from this app."); return; }
+    const sheet = wb.Sheets['Races'] || wb.Sheets[wb.SheetNames.find(n=>n!=='Info'&&n!=='_keymap')] ;
+    if(!sheet){ alert("That workbook has no 'Races' sheet."); return; }
+    const rows = XLSX.utils.sheet_to_json(sheet, {header:1, defval:''});
+    if(!rows.length){ alert("The Races sheet is empty."); return; }
+    // build label->key from _keymap sheet if present, else from current FIELDS
+    const labelToKey={};
+    if(wb.Sheets['_keymap']){
+      XLSX.utils.sheet_to_json(wb.Sheets['_keymap'],{header:1}).slice(1).forEach(r=>{ if(r[0]) labelToKey[String(r[0]).trim()]=String(r[1]).trim(); });
+    }
+    FIELDS.forEach(f=>{ if(!(f[1] in labelToKey)) labelToKey[f[1]]=f[0]; });
+    const headerRow = rows[0].map(h=>String(h).trim());
+    const colKeys = headerRow.map(h=> labelToKey[h] || null );
+    if(!colKeys.includes('num')){ alert("Couldn't find the race-number column — this doesn't look like a file saved from this app."); return; }
+    const imported=[];
+    for(let i=1;i<rows.length;i++){
+      const row=rows[i]; if(row.every(c=>String(c).trim()==='')) continue;
+      const o={}; colKeys.forEach((k,ci)=>{ if(k) o[k]=row[ci]===undefined?'':String(row[ci]); });
+      if(o.num!==undefined && o.num!=='') imported.push(o);
+    }
+    if(!imported.length){ alert("No race rows found in the file."); return; }
+    if(!confirm("Load this file? It will replace the data currently shown.")) return;
+    // header fields + notes from Info sheet
+    if(wb.Sheets['Info']){
+      const info=XLSX.utils.sheet_to_json(wb.Sheets['Info'],{header:1,defval:''});
+      const grab=l=>{ const row=info.find(r=>String(r[0]).trim().toLowerCase()===l); return row?String(row[1]):undefined; };
+      const h={car:grab('car'),team:grab('team'),title:grab('title'),season:grab('season'),driver:grab('driver'),sponsor:grab('sponsor')};
+      Object.keys(h).forEach(k=>{ if(h[k]!==undefined&&h[k]!=='') HEADER[k]=h[k]; });
+      const n=grab('notes'); if(n!==undefined) NOTES=n;
+    }
+    const byNum={}; imported.forEach(r=>{ if(r.num!==undefined) byNum[String(r.num)]=r; });
+    RACES = RACES_DEFAULT.map(def=>{ const s=byNum[String(def.num)]; return s?Object.assign({}, def, s):JSON.parse(JSON.stringify(def)); });
+    persist();
+    activeIdx=Math.min(activeIdx, RACES.length-1);
+    fillHeaderForm && fillHeaderForm();
+    buildRacePicker && buildRacePicker();
+    renderBrand(); renderList(document.getElementById('q').value); renderMain();
+    alert("Data loaded successfully from Excel.");
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ---------- MASTER GRID ---------- */
+function buildGrid(container){
+  if(!container) return;
+  let h = '<table class="mastergrid"><thead><tr>';
+  FIELDS.forEach(([key,label,grp])=>{
+    const pin = key==='num'?' colnum':(key==='track'?' coltrack':'');
+    h += `<th class="g-${grp}${pin}"><span class="grp">${GROUP_LABEL[grp]}</span>${esc(label)}</th>`;
+  });
+  h += '</tr></thead><tbody>';
+  RACES.forEach((r,i)=>{
+    h += '<tr>';
+    FIELDS.forEach(([key,label,grp,isYN],c)=>{
+      const pin = key==='num'?' colnum':(key==='track'?' coltrack':'');
+      const editable = key!=='num';  // # is the join key, keep it read-only
+      const v = r[key]===undefined?'':r[key];
+      const yn = isYN?' data-yesno="1"':'';
+      h += `<td class="${pin}" data-r="${i}" data-c="${c}"><span class="cell"${editable?' contenteditable="true"':''} data-i="${i}" data-key="${esc(key)}"${yn}>${esc(v)}</span></td>`;
+    });
+    h += '</tr>';
+  });
+  h += '</tbody></table>';
+  container.innerHTML = h;
+  wireGridCells(container);
+}
+function wireGridCells(container){
+  container.querySelectorAll('.cell[contenteditable]').forEach(cell=>{
+    const commit = ()=>{
+      const i=+cell.dataset.i, key=cell.dataset.key;
+      let txt=cell.textContent.trim();
+      if(RACES[i][key]===txt) return;
+      RACES[i][key]=txt;
+      persist();
+      // live-update dashboard if the edited row is showing
+      if(i===activeIdx) renderMain();
+      if(key==='track'||key==='type'||key==='date'||key==='location') renderList(document.getElementById('q').value);
+      renderBrand();
+    };
+    cell.addEventListener('blur', commit);
+    cell.addEventListener('keydown', e=>{
+      if(e.key==='Enter'){ e.preventDefault(); cell.blur(); }
+      if(e.key==='Escape'){ cell.textContent=RACES[+cell.dataset.i][cell.dataset.key]||''; cell.blur(); }
+    });
+    // YES/blank toggle on click (only when not already focused-editing)
+    if(cell.dataset.yesno){
+      cell.addEventListener('click', ()=>{
+        if(gridSel.active) return; // don't toggle while making a multi-select
+        const i=+cell.dataset.i, key=cell.dataset.key;
+        const cur=String(RACES[i][key]||'').trim().toUpperCase();
+        const next = cur==='YES' ? '' : 'YES';
+        RACES[i][key]=next; cell.textContent=next; persist();
+        if(i===activeIdx) renderMain();
+      });
+    }
+  });
+  wireGridSelection(container);
+}
+
+/* ===== Master-grid range selection + copy/paste ===== */
+const gridSel = { container:null, anchor:null, focus:null, dragging:false, active:false };
+function gridTd(container, r, c){ return container.querySelector(`td[data-r="${r}"][data-c="${c}"]`); }
+function clearGridSel(){
+  if(gridSel.container) gridSel.container.querySelectorAll('td.cell-sel,td.cell-anchor')
+    .forEach(td=>td.classList.remove('cell-sel','cell-anchor'));
+  gridSel.anchor=gridSel.focus=null; gridSel.active=false;
+}
+function selRect(){
+  if(!gridSel.anchor||!gridSel.focus) return null;
+  return {
+    r0:Math.min(gridSel.anchor.r,gridSel.focus.r), r1:Math.max(gridSel.anchor.r,gridSel.focus.r),
+    c0:Math.min(gridSel.anchor.c,gridSel.focus.c), c1:Math.max(gridSel.anchor.c,gridSel.focus.c)
+  };
+}
+function paintGridSel(){
+  const c=gridSel.container; if(!c) return;
+  c.querySelectorAll('td.cell-sel,td.cell-anchor').forEach(td=>td.classList.remove('cell-sel','cell-anchor'));
+  const rect=selRect(); if(!rect) return;
+  // only mark as a multi-select when more than one cell is involved
+  gridSel.active = !(rect.r0===rect.r1 && rect.c0===rect.c1);
+  if(!gridSel.active) return;
+  for(let r=rect.r0;r<=rect.r1;r++) for(let col=rect.c0;col<=rect.c1;col++){
+    const td=gridTd(c,r,col); if(td) td.classList.add('cell-sel');
+  }
+  const a=gridTd(c,gridSel.anchor.r,gridSel.anchor.c); if(a) a.classList.add('cell-anchor');
+}
+function wireGridSelection(container){
+  const tbody = container.querySelector('table.mastergrid tbody'); if(!tbody) return;
+  tbody.addEventListener('mousedown', e=>{
+    const td = e.target.closest('td[data-r]'); if(!td) return;
+    const r=+td.dataset.r, c=+td.dataset.c;
+    if(e.shiftKey){
+      // extend selection from existing anchor; block text-editing focus
+      e.preventDefault();
+      if(!gridSel.anchor || gridSel.container!==container){ gridSel.container=container; gridSel.anchor={r,c}; }
+      gridSel.focus={r,c}; paintGridSel();
+      window.getSelection && window.getSelection().removeAllRanges();
+    } else {
+      // plain click: set a fresh anchor, begin potential drag-select, allow edit
+      clearGridSel();
+      gridSel.container=container; gridSel.anchor={r,c}; gridSel.focus={r,c}; gridSel.dragging=true;
+    }
+  });
+  tbody.addEventListener('mouseover', e=>{
+    if(!gridSel.dragging) return;
+    const td=e.target.closest('td[data-r]'); if(!td) return;
+    gridSel.focus={r:+td.dataset.r, c:+td.dataset.c};
+    if(gridSel.anchor.r!==gridSel.focus.r||gridSel.anchor.c!==gridSel.focus.c){
+      paintGridSel();
+      window.getSelection && window.getSelection().removeAllRanges();
+    }
+  });
+}
+document.addEventListener('mouseup', ()=>{ gridSel.dragging=false; });
+// keyboard: copy / paste / clear when a grid selection exists
+document.addEventListener('keydown', async e=>{
+  if(!gridSel.active || !gridSel.container) return;
+  const mod = e.ctrlKey||e.metaKey;
+  if(e.key==='Escape'){ clearGridSel(); return; }
+  if(mod && (e.key==='c'||e.key==='C')){
+    e.preventDefault(); copyGridSel();
+  } else if(mod && (e.key==='v'||e.key==='V')){
+    e.preventDefault(); await pasteGridSel();
+  }
+});
+function copyGridSel(){
+  const rect=selRect(); if(!rect) return;
+  const lines=[];
+  for(let r=rect.r0;r<=rect.r1;r++){
+    const row=[];
+    for(let c=rect.c0;c<=rect.c1;c++){
+      const key=FIELDS[c][0];
+      row.push(String(RACES[r][key]??''));
+    }
+    lines.push(row.join('\t'));
+  }
+  const tsv=lines.join('\n');
+  try{ navigator.clipboard.writeText(tsv); }catch(_){ }
+  gridCopyBuffer = tsv; // fallback when clipboard API is blocked (e.g. file://)
+}
+let gridCopyBuffer = '';
+async function readClipboard(){
+  try{ const t=await navigator.clipboard.readText(); if(t!=null && t!=='') return t; }catch(_){ }
+  return gridCopyBuffer;
+}
+function setCellValue(r,c,val){
+  const key=FIELDS[c][0];
+  if(key==='num') return; // read-only join key
+  const v=String(val).trim();
+  if(RACES[r][key]===v) return;
+  RACES[r][key]=v;
+  const td=gridTd(gridSel.container,r,c);
+  if(td){ const cell=td.querySelector('.cell'); if(cell) cell.textContent=v; }
+}
+async function pasteGridSel(){
+  const rect=selRect(); if(!rect) return;
+  const txt=await readClipboard(); if(txt==null||txt==='') return;
+  const grid=txt.replace(/\r/g,'').split('\n').map(line=>line.split('\t'));
+  const pr=grid.length, pc=grid[0].length;
+  if(pr===1 && pc===1){
+    // single value -> fill the whole selection
+    const v=grid[0][0];
+    for(let r=rect.r0;r<=rect.r1;r++) for(let c=rect.c0;c<=rect.c1;c++) setCellValue(r,c,v);
+  } else {
+    // block paste from the top-left of the selection, clipped to grid bounds
+    for(let dr=0;dr<pr;dr++) for(let dc=0;dc<pc;dc++){
+      const r=rect.r0+dr, c=rect.c0+dc;
+      if(r>=RACES.length || c>=FIELDS.length) continue;
+      setCellValue(r,c,grid[dr][dc]);
+    }
+  }
+  persist();
+  renderMain();
+  renderList(document.getElementById('q').value);
+  renderBrand();
+}
+function refreshGrids(){
+  buildGrid(document.getElementById('gridScroll'));
+  if(document.getElementById('overlay').classList.contains('open'))
+    buildGrid(document.getElementById('gridScrollModal'));
+  const gs=document.getElementById('gridSub');
+  if(gs) gs.textContent = `${RACES.length} events · ${FIELDS.length} fields`;
+}
+function renderRefTable(){
+  const el=document.getElementById('refScroll'); if(!el) return;
+  const cols=[["name","Track"],["date","Date"],["laps","Laps"],["miles","Miles"],
+    ["maxSets","Max Sets (P/Q/Race)"],["raceSets","Race Set Allotment"],["prevLeased","Prev-Leased (Practice)"]];
+  let h='<table class="reftbl"><thead><tr>'+cols.map(c=>`<th>${esc(c[1])}</th>`).join('')+'</tr></thead><tbody>';
+  TIRE_CHART.forEach(row=>{
+    h+=`<tr class="${row.rain?'rain':''}">`;
+    cols.forEach(([k])=>{
+      const numeric=["laps","miles","maxSets","raceSets","prevLeased"].includes(k);
+      h+=`<td class="${numeric?'rnum':''}">${esc(row[k])}</td>`;
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table>';
+  el.innerHTML=h;
+}
+function renderRefCodeTable(){
+  const el=document.getElementById('refCodeScroll'); if(!el) return;
+  const cols=[["track","Track"],["ls","Tire Code LS"],["rs","Tire Code RS"],["liner","Inner Liner Utilized"]];
+  let h='<table class="reftbl"><thead><tr>'+cols.map(c=>`<th>${esc(c[1])}</th>`).join('')+'</tr></thead><tbody>';
+  TIRE_CODES.forEach(row=>{
+    h+='<tr>';
+    cols.forEach(([k])=>{ h+=`<td>${esc(row[k]||'—')}</td>`; });
+    h+='</tr>';
+  });
+  h+='</tbody></table>';
+  el.innerHTML=h;
+}
+let currentView='dash';
+function setView(v){
+  currentView=v;
+  const dash=document.getElementById('main'), grid=document.getElementById('gridview');
+  document.getElementById('vtDash').classList.toggle('active', v==='dash');
+  document.getElementById('vtGrid').classList.toggle('active', v==='grid');
+  if(v==='grid'){ dash.style.display='none'; grid.classList.add('show'); buildGrid(document.getElementById('gridScroll')); renderRefTable(); renderRefCodeTable();
+    document.getElementById('gridSub').textContent=`${RACES.length} events · ${FIELDS.length} fields`; }
+  else { dash.style.display=''; grid.classList.remove('show'); }
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function lapsPerSet(laps, sets){
+  const L=parseFloat(laps), S=parseFloat(sets);
+  if(!isFinite(L)||!isFinite(S)||S===0) return '—';
+  const v=L/S;
+  return Number.isInteger(v) ? String(v) : v.toFixed(1);
+}
+function val(v){ if(v===undefined||v===null||String(v).trim()==='') return '<span class="v empty">—</span>'; return '<span class="v">'+esc(v)+'</span>'; }
+function engLabel(v){ const s=String(v||'').trim(); return s.toUpperCase()==='SS' ? 'SS' : (s===''? '—' : 'STD'); }
+function fmtLen(v){ const s=String(v==null?'':v).trim(); if(s==='') return '—'; const n=parseFloat(s); return isNaN(n)?esc(s):n.toFixed(3); }
+function yesno(v){
+  const s=String(v).trim();
+  if(s==='') return '<span class="pill no">—</span>';
+  if(s.toUpperCase()==='YES') return '<span class="pill yes">YES</span>';
+  return '<span class="v">'+esc(v)+'</span>';
+}
+
+function renderBrand(){
+  document.getElementById('brandCar').innerHTML = `CAR&nbsp;#${esc(HEADER.car)}&nbsp;//&nbsp;${esc(HEADER.team)}`;
+  document.getElementById('brandTitle').textContent = HEADER.title;
+  document.getElementById('brandSub').textContent = `${HEADER.season} Season · ${RACES.length} Events`;
+  document.title = `${HEADER.team} — Car Configuration`;
+}
+
+function renderList(filter=''){
+  const list = document.getElementById('list');
+  const f = filter.toLowerCase();
+  list.innerHTML='';
+  // index of the first race today-or-later = where the season "is" now
+  const now = new Date(); now.setHours(0,0,0,0);
+  let nowIdx = RACES.findIndex(r=>{ const d=parseRaceDate(r.date); return d && d>=now; });
+  if(nowIdx===-1) nowIdx = RACES.length; // whole season is in the past
+  const showMarker = !f; // only meaningful in the unfiltered list
+  const marker = ()=>{
+    const m=document.createElement('div');
+    m.className='nowline';
+    m.innerHTML=`<span class="nld"></span><span class="nlt">You are here</span><span class="nl"></span>`;
+    list.appendChild(m);
+  };
+  RACES.forEach((r,i)=>{
+    if(showMarker && i===nowIdx) marker();
+    const hay = (r.track+' '+r.driver+' '+r.sponsor+' '+r.location+' '+(TYPE[r.type]||'')).toLowerCase();
+    if(f && !hay.includes(f)) return;
+    const el=document.createElement('div');
+    el.className='race-item'+(i===activeIdx?' active':'');
+    el.innerHTML=`<span class="rail"></span><span class="no">${String(r.num).padStart(2,'0')}</span>
+      <div class="ti"><div class="tname">${esc(r.track)}</div>
+      <div class="tdate">${esc(r.date)} · ${esc(r.location)}</div></div>
+      <span class="tag ${r.type}">${esc(r.type)}</span>`;
+    el.onclick=()=>{activeIdx=i;renderList(document.getElementById('q').value);renderMain();document.getElementById('main').scrollTop=0;};
+    list.appendChild(el);
+  });
+  if(showMarker && nowIdx===RACES.length) marker(); // season complete: line at the very end
+}
+
+function rowsHTML(pairs){
+  return pairs.map(([k,v,raw])=>`<div class="row"><span class="k">${k}</span><span class="lead"></span>${raw?v:val(v)}</div>`).join('');
+}
+function padCell(label, v){
+  const s = (v==null?'':String(v)).trim();
+  return `<div class="pc"><span class="pl">${label}</span><span class="pv${s?'':' empty'}">${s?esc(s):'—'}</span></div>`;
+}
+function fanCell(v){
+  const s = (v==null?'':String(v)).trim();
+  return `<div class="fc${s?'':' empty'}">${s?esc(s):'—'}</div>`;
+}
+function nacaCells(r){
+  let h='';
+  for(let n=1;n<=10;n++){
+    const s=(r['naca'+n]==null?'':String(r['naca'+n])).trim();
+    h+=`<div class="nc"><span class="nk">NACA ${n}</span><span class="nv${s?'':' empty'}">${s?esc(s):'—'}</span></div>`;
+  }
+  return h;
+}
+
+function renderMain(){
+  const r = RACES[activeIdx];
+  const main = document.getElementById('main');
+  main.innerHTML = `
+  <div class="hero" data-no="${String(r.num).padStart(2,'0')}">
+    <div class="hero-scan"></div>
+    <div class="herobill"><span class="hb-row"><span class="hb-lbl">Driver</span><span class="hb-driver">${esc(r.driver)||'—'}</span></span><span class="hb-row"><span class="hb-lbl">Sponsor</span><span class="hb-sponsor">${esc(r.sponsor)||'—'}</span></span></div>
+    <div class="herotext">
+      <div class="crumb"><span class="cdot ${r.type}"></span>EVENT&nbsp;${String(r.num).padStart(2,'0')}&nbsp;/&nbsp;${RACES.length}&nbsp;&middot;&nbsp;${(TYPE[r.type]||'').toUpperCase()}</div>
+      <h2>${esc(r.track)}</h2>
+      <div class="loc"><span class="pin"></span>${esc(r.location)}</div>
+    </div>
+    <div class="herometa">
+      <div class="hm"><span class="k">DATE</span><span class="v">${esc(r.date)}</span></div>
+      <div class="hm"><span class="k">GREEN FLAG</span><span class="v">${esc(r.start)}</span></div>
+      <div class="hm wx" id="wxBlock"><span class="k">RACE-DAY TEMP</span>
+        <span class="v"><span class="wicon" id="wxIcon">⛅</span><span id="wxTemp">${esc(r.temp)}<small>°F</small></span></span>
+        <span class="wstate loading" id="wxState">checking forecast…</span>
+        <span class="wdesc" id="wxDesc"></span>
+      </div>
+      <div class="hm"><span class="k">LENGTH</span><span class="v">${fmtLen(r.length)}<small>MI</small></span></div>
+      <div class="hm"><span class="k">RACE DISTANCE</span><span class="v">${esc(r.allocMiles)?esc(r.allocMiles)+'<small>MI</small>':'—'}</span></div>
+      <div class="hm"><span class="k">STAGES</span><span class="v">${esc(r.stages)||'—'}</span></div>
+      <div class="hm"><span class="k">PIT ROAD SPEED</span><span class="v">${esc(r.pitSpeed)?esc(r.pitSpeed)+'<small>MPH</small>':'—'}</span></div>
+      <div class="hm"><span class="k">ENGINE</span><span class="v">${esc(engLabel(r.engine))}</span></div>
+    </div>
+  </div>
+  <div class="allocstrip"><div class="cardglow"></div>
+    <h3><span class="ttl">Tire Allocation</span><span class="tspec"><span class="tp"><span class="tk">Tire LS</span><span class="tv">${esc(r.tireLS)||'—'}</span></span><span class="tp"><span class="tk">Tire RS</span><span class="tv">${esc(r.tireRS)||'—'}</span></span><span class="tp"><span class="tk">Inner Liner</span><span class="tv">${esc(r.innerLiner)||'—'}</span></span></span><span class="dot"></span></h3>
+    <div class="allocrow">
+      <div class="ac"><span class="k">Laps</span><span class="v">${esc(r.allocLaps)||'—'}</span></div>
+      <div class="ac"><span class="k">Max Sets (P/Q/Race)</span><span class="v">${esc(r.allocMaxSets)||'—'}</span></div>
+      <div class="ac"><span class="k">Race Set Allotment</span><span class="v">${esc(r.allocRaceSets)||'—'}</span></div>
+      <div class="ac calc"><span class="k">Laps/Set</span><span class="v">${lapsPerSet(r.allocLaps, r.allocRaceSets)}</span></div>
+      ${String(r.allocRainMax||'').trim() ? `
+      <div class="ac rain"><span class="k">Rain — Max Sets</span><span class="v">${esc(r.allocRainMax)}</span></div>
+      <div class="ac rain"><span class="k">Rain — Race Sets</span><span class="v">${esc(r.allocRainRace)}</span></div>` : ''}
+    </div>
+  </div>
+  <div class="grid">
+    <div class="card setup" style="--d:1"><div class="cardglow"></div>
+      <h3><span class="chan">CH&middot;01</span><span class="ttl">Brake Ducts</span><span class="dot"></span></h3>
+      <div class="rows">${rowsHTML([
+        ['Brake Ducts', yesno(r.brakeDucts), true],
+      ])}<div class="padcap">Front Brake Fans</div>
+      <div class="fangrid">
+        <div class="fh"></div><div class="fh">LF</div><div class="fh">RF</div>
+        <div class="fs">Bead</div>${fanCell(r.fanLFbead)}${fanCell(r.fanRFbead)}
+        <div class="fs">Caliper</div>${fanCell(r.fanLFcaliper)}${fanCell(r.fanRFcaliper)}
+        <div class="fs">Rotor</div>${fanCell(r.fanLFrotor)}${fanCell(r.fanRFrotor)}
+      </div>
+      <div class="padcap">Rear Brake Fans</div>
+      <div class="fangrid">
+        <div class="fh"></div><div class="fh">LR</div><div class="fh">RR</div>
+        <div class="fs">Caliper</div>${fanCell(r.fanLRcaliper)}${fanCell(r.fanRRcaliper)}
+        <div class="fs">Rotor</div>${fanCell(r.fanLRrotor)}${fanCell(r.fanRRrotor)}
+      </div>
+      <div class="padcap">Shrouds</div>
+      <div class="padgrid">
+        ${padCell('LF', r.shroudLF)}${padCell('RF', r.shroudRF)}
+        ${padCell('LR', r.shroudLR)}${padCell('RR', r.shroudRR)}
+      </div></div>
+    </div>
+    <div class="card windshield" style="--d:2"><div class="cardglow"></div>
+      <h3><span class="chan">CH&middot;02</span><span class="ttl">Windshield</span><span class="dot"></span></h3>
+      <div class="rows">${rowsHTML([
+        ['Type', r.windshieldType],
+        ['Tear-offs', r.tearoffs],
+        ['Wiper', yesno(r.wiper), true],
+        ['Defogger', yesno(r.defogger), true],
+        ['Sealing', r.windshieldSealing],
+        ['Blackout', r.windshieldBlackout],
+      ])}</div>
+    </div>
+    <div class="card glass" style="--d:3"><div class="cardglow"></div>
+      <h3><span class="chan">CH&middot;03</span><span class="ttl">Windows / Mirrors</span><span class="dot"></span></h3>
+      <div class="rows">${rowsHTML([
+        ['RS Window', yesno(r.rsWindow), true],
+        ['RS Window Cfg', r.rsWindow2],
+        ['RS Window Tint', r.rsTint],
+      ])}<div class="padcap">Quarter Windows</div>
+      <div class="padgrid col1">
+        ${padCell('LR', r.lrQuarter)}${padCell('RR', r.rrQuarter)}
+      </div><div class="padcap">NACA Ducts</div>
+      <div class="nacagrid">${nacaCells(r)}</div></div>
+    </div>
+    <div class="card brakes" style="--d:4"><div class="cardglow"></div>
+      <h3><span class="chan">CH&middot;04</span><span class="ttl">Brake Package</span><span class="dot"></span></h3>
+      <div class="rows">${rowsHTML([
+        ['Plumbing', r.plumbing],
+        ['Front Rotor', r.frontRotor],
+        ['Front Rotor P/N', r.frontRotorPN],
+        ['Rear Rotor', r.rearRotor],
+        ['Rear Rotor P/N', r.rearRotorPN],
+      ])}<div class="padcap">Brake Pads</div>
+      <div class="padgrid">
+        ${padCell('LF', r.lfPad)}${padCell('RF', r.rfPad)}
+        ${padCell('LR', r.lrPad)}${padCell('RR', r.rrPad)}
+      </div>${rowsHTML([
+        ['Front Caliper', r.frontCal],
+        ['Rear Caliper', r.rearCal],
+      ])}<div class="padcap">Master Cylinders</div>
+      <div class="padgrid">
+        ${padCell('Front', r.frontMaster)}${padCell('Rear', r.rearMaster)}
+      </div><div class="padcap">Pressure Bias (PSI)</div>
+      <div class="padgrid">
+        ${padCell('Front', r.psiF)}${padCell('Rear', r.psiR)}
+      </div>${rowsHTML([
+        ['Prop Valve', r.propValve],
+      ])}</div>
+    </div>
+    <div class="card interior" style="--d:5"><div class="cardglow"></div>
+      <h3><span class="chan">CH&middot;05</span><span class="ttl">Interior</span><span class="dot"></span></h3>
+      <div class="rows">${rowsHTML([
+        ['LS Mirror Type', r.lsMirror],
+        ['LS Mirror Color', r.lsMirrorColor],
+        ['Rearview Mirror', r.rearMirror],
+        ['Firebottle Location', r.firebottles],
+      ])}</div>
+    </div>
+    <div class="card systems" style="--d:6"><div class="cardglow"></div>
+      <h3><span class="chan">CH&middot;06</span><span class="ttl">Electrical / Cooling</span><span class="dot"></span></h3>
+      <div class="rows">${rowsHTML([
+        ['Battery', r.battery],
+        ['Radiator Fan', r.radiatorFan],
+      ])}</div>
+    </div>
+    <div class="card steering" style="--d:7"><div class="cardglow"></div>
+      <h3><span class="chan">CH&middot;07</span><span class="ttl">Steering</span><span class="dot"></span></h3>
+      <div class="rows">${rowsHTML([
+        ['Box Ratio', r.steerRatio],
+        ['Box Torque', r.steerTorque],
+        ['Pump', r.steerPump],
+        ['Orifice', r.steerOrifice],
+      ])}</div>
+    </div>
+    <div class="card notes" style="--d:8"><div class="cardglow"></div>
+      <h3><span class="chan">LOG</span><span class="ttl">Team Notes</span><span class="notehint">click to edit</span><span class="dot"></span></h3>
+      <div class="notetext" id="noteEdit" contenteditable="true" spellcheck="true" data-ph="Click here to add notes for this race…">${esc(r.notes||'')}</div>
+    </div>
+  </div>
+  <div class="foot"><span class="foot-l"></span>${esc(HEADER.season)}&nbsp;#${esc(HEADER.car)}&nbsp;${esc(HEADER.team)}&nbsp;&middot;&nbsp;CAR CONFIGURATION TELEMETRY<span class="foot-l"></span></div>`;
+  const noteEl=document.getElementById('noteEdit');
+  if(noteEl){
+    const idx=activeIdx;
+    const saveNote=()=>{ const t=noteEl.innerText.replace(/\u00a0/g,' ').trimEnd(); if(RACES[idx].notes!==t){ RACES[idx].notes=t; persist(); } };
+    noteEl.addEventListener('blur', saveNote);
+    noteEl.addEventListener('input', ()=>{ clearTimeout(noteEl._t); noteEl._t=setTimeout(saveNote, 600); });
+  }
+  loadWeather(r, activeIdx);
+}
+
+/* ---------- LIVE WEATHER (Open-Meteo, no API key) ---------- */
+const WX_CODE = {
+  0:['☀️','Clear'],1:['🌤️','Mainly clear'],2:['⛅','Partly cloudy'],3:['☁️','Overcast'],
+  45:['🌫️','Fog'],48:['🌫️','Rime fog'],51:['🌦️','Light drizzle'],53:['🌦️','Drizzle'],55:['🌦️','Dense drizzle'],
+  61:['🌧️','Light rain'],63:['🌧️','Rain'],65:['🌧️','Heavy rain'],66:['🌧️','Freezing rain'],67:['🌧️','Freezing rain'],
+  71:['🌨️','Light snow'],73:['🌨️','Snow'],75:['🌨️','Heavy snow'],77:['🌨️','Snow grains'],
+  80:['🌦️','Rain showers'],81:['🌦️','Rain showers'],82:['⛈️','Violent showers'],
+  85:['🌨️','Snow showers'],86:['🌨️','Snow showers'],95:['⛈️','Thunderstorm'],96:['⛈️','Thunderstorm + hail'],99:['⛈️','Thunderstorm + hail']
+};
+const wxCache = {};
+function parseRaceDate(s){
+  // e.g. "Feb 14, 2026" -> Date
+  const d = new Date(s);
+  return isNaN(d) ? null : d;
+}
+function isoDate(d){ return d.toISOString().slice(0,10); }
+
+async function loadWeather(r, idx){
+  const stateEl=document.getElementById('wxState'), tempEl=document.getElementById('wxTemp'),
+        iconEl=document.getElementById('wxIcon'), descEl=document.getElementById('wxDesc');
+  if(!stateEl) return;
+  const coords = TRACK_META.coords[trackKey(r.track)];
+  const planned = r.temp;
+  function showPlanned(reason){
+    if(activeIdx!==idx) return;
+    tempEl.innerHTML = esc(planned)+'<small>°F</small>';
+    stateEl.textContent = reason; stateEl.className='wstate planned';
+    descEl.textContent='';
+  }
+  if(!coords){ showPlanned('planned (no coords)'); return; }
+  const raceDate = parseRaceDate(r.date);
+  if(!raceDate){ showPlanned('planned'); return; }
+  const today = new Date(); today.setHours(0,0,0,0);
+  const dayMs=864e5;
+  const diffDays = Math.round((raceDate - today)/dayMs);
+  // Open-Meteo daily forecast covers ~16 days ahead. Past dates or >15 days -> planned.
+  if(diffDays < 0){ showPlanned('race completed · planned'); return; }
+  if(diffDays > 15){ showPlanned(`forecast in ${diffDays-15}d · planned`); return; }
+
+  const cacheKey = trackKey(r.track)+'|'+isoDate(raceDate);
+  try{
+    let data = wxCache[cacheKey];
+    if(!data){
+      const [lat,lon]=coords;
+      const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`+
+        `&daily=temperature_2m_max,temperature_2m_min,weather_code&temperature_unit=fahrenheit`+
+        `&timezone=auto&forecast_days=16`;
+      const resp=await fetch(url);
+      if(!resp.ok) throw new Error('http '+resp.status);
+      data=await resp.json();
+      wxCache[cacheKey]=data;
+    }
+    if(activeIdx!==idx) return; // user navigated away
+    const target=isoDate(raceDate);
+    const i=data.daily.time.indexOf(target);
+    if(i===-1){ showPlanned('planned'); return; }
+    const hi=Math.round(data.daily.temperature_2m_max[i]);
+    const lo=Math.round(data.daily.temperature_2m_min[i]);
+    const code=data.daily.weather_code[i];
+    const [icon,desc]=WX_CODE[code]||['🌡️',''];
+    tempEl.innerHTML = hi+'<small>°F</small>';
+    iconEl.textContent = icon;
+    stateEl.textContent = `live forecast · ${diffDays===0?'today':diffDays+'d out'}`;
+    stateEl.className='wstate live';
+    descEl.textContent = `${desc} · low ${lo}°`;
+  }catch(e){
+    if(activeIdx!==idx) return;
+    showPlanned('offline · planned');
+  }
+}
+
+/* ---------- MODAL ---------- */
+const overlay=document.getElementById('overlay');
+function openModal(pane){
+  overlay.classList.add('open');
+  fillHeaderForm(); buildRacePicker(); fillRaceForm(); document.getElementById('m_notes').value=NOTES;
+  if(pane) switchPane(pane);
+}
+function closeModal(){ overlay.classList.remove('open'); }
+function switchPane(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.pane===id));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active',p.id===id));
+  if(id==='p-grid') buildGrid(document.getElementById('gridScrollModal'));
+}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>switchPane(t.dataset.pane));
+document.getElementById('gearBtn').onclick=()=>openModal('p-header');
+document.getElementById('exportBtn').onclick=exportData;
+document.getElementById('importBtn').onclick=()=>document.getElementById('importFile').click();
+document.getElementById('importFile').onchange=e=>{ const f=e.target.files[0]; if(f) importData(f); e.target.value=''; };
+const THEME_KEY="noaps_theme";
+const themeBtn=document.getElementById('themeBtn');
+function applyTheme(mode){
+  const light = mode==='light';
+  document.body.classList.toggle('light', light);
+  // sun when in light mode (click to go dark), moon when in dark mode
+  themeBtn.innerHTML = light ? '&#9728;' : '&#9790;';
+  themeBtn.title = light ? 'Switch to dark mode' : 'Switch to light mode';
+}
+(function initTheme(){
+  let saved=null; try{ saved=localStorage.getItem(THEME_KEY); }catch(e){}
+  applyTheme(saved==='light'?'light':'dark');
+})();
+themeBtn.onclick=()=>{
+  const nowLight = !document.body.classList.contains('light');
+  applyTheme(nowLight?'light':'dark');
+  try{ localStorage.setItem(THEME_KEY, nowLight?'light':'dark'); }catch(e){}
+};
+document.getElementById('vtDash').onclick=()=>setView('dash');
+document.getElementById('vtGrid').onclick=()=>setView('grid');
+document.getElementById('closeX').onclick=closeModal;
+document.getElementById('cancelBtn').onclick=closeModal;
+overlay.onclick=e=>{ if(e.target===overlay) closeModal(); };
+
+function fillHeaderForm(){
+  m_car.value=HEADER.car; m_team.value=HEADER.team; m_title.value=HEADER.title;
+  m_season.value=HEADER.season; m_driver.value=HEADER.driver; m_sponsor.value=HEADER.sponsor;
+}
+function buildRacePicker(){
+  const sel=document.getElementById('m_racepick'); sel.innerHTML='';
+  RACES.forEach((r,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=`${String(r.num).padStart(2,'0')} — ${r.track}`; sel.appendChild(o); });
+  sel.value=String(editIdx);
+  sel.onchange=()=>{ editIdx=+sel.value; fillRaceForm(); };
+}
+function fillRaceForm(){
+  const r=RACES[editIdx]; if(!r) return;
+  RACE_KEYS.forEach(k=>{ if(k==='num') return; const el=document.getElementById('r_'+k); if(el) el.value=r[k]!==undefined?r[k]:''; });
+}
+
+/* ---------- SAVE ---------- */
+function readForms(){
+  HEADER={car:m_car.value.trim(),team:m_team.value.trim(),title:m_title.value.trim()||'CONFIGURATION',
+    season:m_season.value.trim(),driver:m_driver.value.trim(),sponsor:m_sponsor.value.trim()};
+  const r=RACES[editIdx];
+  if(r){ RACE_KEYS.forEach(k=>{ if(k==='num') return; const el=document.getElementById('r_'+k); if(el) r[k]=el.value; }); }
+  NOTES=document.getElementById('m_notes').value;
+}
+document.getElementById('saveBtn').onclick=()=>{
+  readForms(); persist(); renderBrand(); renderList(document.getElementById('q').value); renderMain(); refreshGrids();
+  const m=document.getElementById('saveMsg'); m.classList.add('show'); setTimeout(()=>m.classList.remove('show'),1800);
+};
+document.getElementById('resetBtn').onclick=()=>{
+  if(!confirm('Reset all edits back to the original published values? This clears your local changes.')) return;
+  localStorage.removeItem(LS_KEY); loadState(); fillHeaderForm(); buildRacePicker(); fillRaceForm();
+  document.getElementById('m_notes').value=NOTES; renderBrand(); renderList(); renderMain(); refreshGrids();
+};
+
+/* ---------- PUBLISH / EXPORT ---------- */
+function buildConfigBlock(){
+  readForms();
+  const h=JSON.stringify(HEADER,null,2);
+  const n=JSON.stringify(NOTES);
+  const races=JSON.stringify(RACES);
+  return `/*===CONFIG-BLOCK-START=== edit values here (or via the Master Page) then commit to GitHub */
+const DEFAULT_HEADER = ${h};
+const DEFAULT_NOTES = ${n};
+const RACES_DEFAULT = ${races};
+/*===CONFIG-BLOCK-END===*/`;
+}
+document.getElementById('genBtn').onclick=()=>{ document.getElementById('exportBox').value=buildConfigBlock(); };
+document.getElementById('dlXlsxBtn').onclick=downloadMasterXlsx;
+document.getElementById('copyBtn').onclick=()=>{
+  const box=document.getElementById('exportBox'); if(!box.value) box.value=buildConfigBlock();
+  box.select(); document.execCommand('copy');
+  const b=document.getElementById('copyBtn'); const t=b.textContent; b.textContent='Copied ✓'; setTimeout(()=>b.textContent=t,1500);
+};
+document.getElementById('downloadBtn').onclick=()=>{
+  readForms();
+  const doc='<!DOCTYPE html>\n<html'+document.documentElement.innerHTML.split('<html')[1];
+  // rebuild from current document but with fresh config block injected
+  let src=document.documentElement.outerHTML;
+  const block=buildConfigBlock();
+  src=src.replace(/\/\*===CONFIG-BLOCK-START===[\s\S]*?===CONFIG-BLOCK-END===\*\//, block.replace(/\$/g,'$$$$'));
+  const blob=new Blob(['<!DOCTYPE html>\n'+src],{type:'text/html'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='car_configuration.html'; a.click();
+};
+
+/*===EMBEDDED-XLSX-START=== the master workbook lives here as base64. Re-embed with embed.py after editing the source .xlsx. */
+const MASTER_XLSX_B64 = "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";
+const MASTER_XLSX_NAME = "NOAPS_Master_Config.xlsx";
+/*===EMBEDDED-XLSX-END===*/
+function downloadMasterXlsx(){
+  try{
+    const bin=atob(MASTER_XLSX_B64); const len=bin.length; const bytes=new Uint8Array(len);
+    for(let i=0;i<len;i++) bytes[i]=bin.charCodeAt(i);
+    const blob=new Blob([bytes],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=MASTER_XLSX_NAME; a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  }catch(e){ alert("Could not extract workbook: "+e.message); }
+}
+
+/* ---------- INIT ---------- */
+document.getElementById('q').addEventListener('input',e=>renderList(e.target.value));
+loadState(); renderBrand(); renderList(); renderMain();
+</script>
+</body>
+</html>
