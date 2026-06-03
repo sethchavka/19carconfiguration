@@ -207,7 +207,7 @@ a.hm.wx:hover .wxlink{opacity:1;color:var(--accent)}
 .allocrow .ac.rain .k{color:var(--st);opacity:.8}
 .allocrow .ac.calc .v{color:var(--accent)}
 .allocrow .ac.calc .k{color:var(--accent-dim)}
-.grid{padding:28px 40px 56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.grid{padding:28px 40px 56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;align-items:start}
 .card{background:linear-gradient(180deg,var(--panel2),var(--panel) 60px);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;position:relative;
   box-shadow:var(--shadow);transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s,border-color .22s;
   animation:cardIn .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.32s + var(--d,1) * .07s)}
@@ -260,6 +260,12 @@ a.hm.wx:hover .wxlink{opacity:1;color:var(--accent)}
 .padgrid .pc.diff .pl{color:var(--accent2,#ff5d5d)}
 .padgrid .pc.diff .pv{color:var(--accent2,#ff5d5d)}
 .padcap{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:1.4px;color:var(--accent-dim);text-transform:uppercase;padding:13px 18px 2px}
+.spectable{margin:8px 15px;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;
+  display:grid;grid-template-columns:auto 1fr 1fr;gap:1px;background:var(--line);box-shadow:inset 0 1px 6px -3px rgba(0,0,0,.6)}
+.spectable .sc{background:var(--panel2);padding:8px 12px;display:flex;align-items:center;font-family:var(--mono);font-size:13.5px;color:var(--txt);min-height:0}
+.spectable .sc.sh{background:var(--panel3);font-size:9.5px;letter-spacing:1.2px;color:var(--dim);text-transform:uppercase;font-weight:700;padding:6px 12px}
+.spectable .sc.name{font-family:var(--ui);font-size:13px;color:var(--muted);font-weight:600}
+.spectable .sc.empty{color:var(--dim)}
 .fangrid{margin:8px 15px;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;
   display:grid;grid-template-columns:auto 1fr 1fr;gap:1px;background:var(--line);box-shadow:inset 0 1px 6px -3px rgba(0,0,0,.6)}
 .fangrid .fh{background:var(--panel3);padding:6px 12px;font-family:var(--mono);font-size:9px;
@@ -1245,6 +1251,12 @@ function renderList(filter=''){
 function rowsHTML(pairs){
   return pairs.map(([k,v,raw])=>`<div class="row"><span class="k">${k}</span><span class="lead"></span>${raw?v:val(v)}</div>`).join('');
 }
+function specRow(name, type, color){
+  const t=(type==null?'':String(type)).trim(), c=(color==null?'':String(color)).trim();
+  return `<div class="sc name">${name}</div>`+
+         `<div class="sc${t?'':' empty'}">${t?esc(t):'—'}</div>`+
+         `<div class="sc${c?'':' empty'}">${c?esc(c):'—'}</div>`;
+}
 function diffPair(a, b){
   const x=(a==null?'':String(a)).trim(), y=(b==null?'':String(b)).trim();
   return x!=='' && y!=='' && x!==y;
@@ -1369,18 +1381,13 @@ function renderMain(){
       <div class="rows"><div class="padcap">Pins</div>
       <div class="padgrid">
         ${padCell('Hood', r.hoodPinType)}${padCell('Decklid', r.decklidPinType)}
-      </div><div class="padcap">Roof Rail</div>
-      <div class="padgrid">
-        ${padCell('Type', r.roofRailType)}${padCell('Color', r.roofRailColor)}
-      </div><div class="padcap">Sharkfin</div>
-      <div class="padgrid">
-        ${padCell('Type', r.sharkfinType)}${padCell('Color', r.sharkfinColor)}
-      </div><div class="padcap">Deckfin</div>
-      <div class="padgrid">
-        ${padCell('Type', r.deckfinType)}${padCell('Color', r.deckfinColor)}
-      </div><div class="padcap">Spoiler</div>
-      <div class="padgrid">
-        ${padCell('Type', r.spoilerType)}${padCell('Color', r.spoilerColor)}
+      </div><div class="padcap">Aero / Trim</div>
+      <div class="spectable">
+        <div class="sc sh"></div><div class="sc sh">Type</div><div class="sc sh">Color</div>
+        ${specRow('Roof Rail', r.roofRailType, r.roofRailColor)}
+        ${specRow('Sharkfin', r.sharkfinType, r.sharkfinColor)}
+        ${specRow('Deckfin', r.deckfinType, r.deckfinColor)}
+        ${specRow('Spoiler', r.spoilerType, r.spoilerColor)}
       </div><div class="padcap">Other</div>${rowsHTML([
         ['Camera Pod Color', r.cameraPodColor],
         ['Skirt Tape Color', r.skirtTapeColor],
