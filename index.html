@@ -208,6 +208,7 @@ a.hm.wx:hover .wxlink{opacity:1;color:var(--accent)}
 .allocrow .ac.calc .v{color:var(--accent)}
 .allocrow .ac.calc .k{color:var(--accent-dim)}
 .grid{padding:28px 40px 56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;align-items:start}
+.cardstack{display:flex;flex-direction:column;gap:20px;min-width:0}
 .card{background:linear-gradient(180deg,var(--panel2),var(--panel) 60px);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;position:relative;
   box-shadow:var(--shadow);transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s,border-color .22s;
   animation:cardIn .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.32s + var(--d,1) * .07s)}
@@ -1342,19 +1343,8 @@ function renderMain(){
         ${padCell('LR', r.shroudLR)}${padCell('RR', r.shroudRR)}
       </div></div>
     </div>
-    <div class="card windshield" style="--d:2"><div class="cardglow"></div>
-      <h3><span class="chan">CH&middot;02</span><span class="ttl">Windshield</span><span class="dot"></span></h3>
-      <div class="rows">${rowsHTML([
-        ['Type', r.windshieldType],
-        ['Tear-offs', r.tearoffs],
-        ['Wiper', yesno(r.wiper), true],
-        ['Defogger', yesno(r.defogger), true],
-        ['Sealing', r.windshieldSealing],
-        ['Blackout', r.windshieldBlackout],
-      ])}</div>
-    </div>
-    <div class="card glass" style="--d:3"><div class="cardglow"></div>
-      <h3><span class="chan">CH&middot;03</span><span class="ttl">RS / Quarter Windows</span><span class="dot"></span></h3>
+    <div class="card glass" style="--d:2"><div class="cardglow"></div>
+      <h3><span class="chan">CH&middot;02</span><span class="ttl">RS / Quarter Windows</span><span class="dot"></span></h3>
       <div class="rows">${rowsHTML([
         ['RS Window', yesno(r.rsWindow), true],
         ['RS Window Cfg', r.rsWindow2],
@@ -1365,7 +1355,19 @@ function renderMain(){
       </div><div class="padcap">NACA Ducts</div>
       <div class="nacagrid">${nacaCells(r)}</div></div>
     </div>
-    <div class="card interior" style="--d:5"><div class="cardglow"></div>
+    <div class="cardstack" style="--d:3">
+    <div class="card windshield"><div class="cardglow"></div>
+      <h3><span class="chan">CH&middot;03</span><span class="ttl">Windshield</span><span class="dot"></span></h3>
+      <div class="rows">${rowsHTML([
+        ['Type', r.windshieldType],
+        ['Tear-offs', r.tearoffs],
+        ['Wiper', yesno(r.wiper), true],
+        ['Defogger', yesno(r.defogger), true],
+        ['Sealing', r.windshieldSealing],
+        ['Blackout', r.windshieldBlackout],
+      ])}</div>
+    </div>
+    <div class="card interior"><div class="cardglow"></div>
       <h3><span class="chan">CH&middot;04</span><span class="ttl">Interior Components</span><span class="dot"></span></h3>
       <div class="rows"><div class="padcap">LS Mirror</div>
       <div class="padgrid">
@@ -1375,6 +1377,7 @@ function renderMain(){
         ['Radio Location', r.radioLoc],
         ['Firebottle(s) Location', r.firebottles],
       ])}</div>
+    </div>
     </div>
     <div class="card exterior" style="--d:6"><div class="cardglow"></div>
       <h3><span class="chan">CH&middot;05</span><span class="ttl">Exterior Components</span><span class="dot"></span></h3>
@@ -1401,11 +1404,12 @@ function renderMain(){
       <h3><span class="chan">CH&middot;06</span><span class="ttl">Brake Package</span><span class="dot"></span></h3>
       <div class="rows">${rowsHTML([
         ['Plumbing', r.plumbing],
-        ['Front Rotor', r.frontRotor],
-        ['Front Rotor P/N', r.frontRotorPN],
-        ['Rear Rotor', r.rearRotor],
-        ['Rear Rotor P/N', r.rearRotorPN],
-      ])}<div class="padcap">Brake Pads</div>
+      ])}<div class="padcap">Rotors</div>
+      <div class="spectable">
+        <div class="sc sh"></div><div class="sc sh">Front</div><div class="sc sh">Rear</div>
+        ${specRow('Rotor', r.frontRotor, r.rearRotor)}
+        ${specRow('Rotor P/N', r.frontRotorPN, r.rearRotorPN)}
+      </div><div class="padcap">Brake Pads</div>
       <div class="padgrid">
         ${padCell('LF', r.lfPad)}${padCell('RF', r.rfPad, diffPair(r.lfPad, r.rfPad))}
         ${padCell('LR', r.lrPad, diffPair(r.lrPad, r.rrPad))}${padCell('RR', r.rrPad)}
@@ -1413,12 +1417,11 @@ function renderMain(){
       <div class="padgrid">
         ${padCell('LF', r.calLF)}${padCell('RF', r.calRF, diffPair(r.calLF, r.calRF))}
         ${padCell('LR', r.calLR, diffPair(r.calLR, r.calRR))}${padCell('RR', r.calRR)}
-      </div><div class="padcap">Master Cylinders</div>
-      <div class="padgrid">
-        ${padCell('Front', r.frontMaster)}${padCell('Rear', r.rearMaster)}
-      </div><div class="padcap">Pressure Bias (PSI)</div>
-      <div class="padgrid">
-        ${padCell('Front', r.psiF)}${padCell('Rear', r.psiR)}
+      </div><div class="padcap">Master Cyl · Pressure</div>
+      <div class="spectable">
+        <div class="sc sh"></div><div class="sc sh">Front</div><div class="sc sh">Rear</div>
+        ${specRow('Master Cyl', r.frontMaster, r.rearMaster)}
+        ${specRow('Pressure PSI', r.psiF, r.psiR)}
       </div>${rowsHTML([
         ['Prop Valve', r.propValve],
       ])}</div>
