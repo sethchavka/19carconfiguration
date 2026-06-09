@@ -846,6 +846,11 @@ const RACE_KEYS = ["num","track","type","length","stages","pitSpeed","engine","d
   "allocRainMax","allocRainRace",
   "tireLS","tireRS","innerLiner","notes"];
 const LS_KEY = "noaps_car_config_v1";
+// Bumped on every fresh bake of an uploaded Excel. When the file's stamp is
+// newer than what the browser last saw, the freshly-baked file data wins over
+// any older copy sitting in this browser's localStorage.
+const BUILD_STAMP = "2026-06-09T0001";
+const STAMP_KEY = "noaps_car_config_stamp";
 
 // Field metadata for the grid: [key, label, group, isYesNo]
 const FIELDS = [
@@ -893,6 +898,22 @@ let HEADER, NOTES, RACES, activeIdx = 0, editIdx = 0;
 function loadState(){
   let saved=null;
   try{ saved = JSON.parse(localStorage.getItem(LS_KEY)||"null"); }catch(e){}
+  let savedStamp=null;
+  try{ savedStamp = localStorage.getItem(STAMP_KEY); }catch(e){}
+
+  // If this file was freshly baked (its BUILD_STAMP differs from what this
+  // browser last saw), the file is the source of truth: discard the stale
+  // localStorage copy so the new baked data shows, and re-stamp the browser.
+  const fileIsNewer = (savedStamp !== BUILD_STAMP);
+  if(fileIsNewer){
+    HEADER = Object.assign({}, DEFAULT_HEADER);
+    NOTES  = DEFAULT_NOTES;
+    RACES  = JSON.parse(JSON.stringify(RACES_DEFAULT));
+    try{ localStorage.setItem(STAMP_KEY, BUILD_STAMP); }catch(e){}
+    persist(); // save the fresh file data under this browser's key
+    return;
+  }
+
   if(saved){
     HEADER = Object.assign({}, DEFAULT_HEADER, saved.header||{});
     NOTES  = saved.notes!==undefined ? saved.notes : DEFAULT_NOTES;
@@ -913,6 +934,7 @@ function loadState(){
     HEADER = Object.assign({}, DEFAULT_HEADER);
     NOTES  = DEFAULT_NOTES;
     RACES  = JSON.parse(JSON.stringify(RACES_DEFAULT));
+    try{ localStorage.setItem(STAMP_KEY, BUILD_STAMP); }catch(e){}
   }
 }
 function persist(){
